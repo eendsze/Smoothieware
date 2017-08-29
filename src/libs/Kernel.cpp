@@ -110,8 +110,10 @@ Kernel::Kernel()
 
 #ifdef CNC
     this->grbl_mode = this->config->value( grbl_mode_checksum )->by_default(true)->as_bool();
+
 #else
     this->grbl_mode = this->config->value( grbl_mode_checksum )->by_default(false)->as_bool();
+    hahah
 #endif
 
     this->enable_feed_hold = this->config->value( feed_hold_enable_checksum )->by_default(this->grbl_mode)->as_bool();
