@@ -1,4 +1,6 @@
-# Smoothieboard configuration file, see http://smoothieware.org/configuring-smoothie
+
+#  >>>>>>>>>>>>>>>>>>>>  M A R O G E P Konfiguracios file <<<<<<<<<<<<<<<<<<<<<
+
 # NOTE Lines must not exceed 132 characters, and '#' characters mean what follows is ignored
 ## Robot module configurations : general handling of movement G-codes and slicing into moves
 
@@ -12,6 +14,12 @@ mm_max_arc_error                             0.01             # The maximum erro
                                                               # if both are used, will use largest segment length based on radius
 
 
+# Drills module                                               
+# Implement the Canned Drilling Cycles                        
+# G80-83, G98, G99 in absolute mode only                      
+# Incremental mode not implemented (L)                        
+drillingcycles.enable                         true            # enable module, default false
+drillingcycles.dwell_units                    S               # dwell units [S = seconds, P = millis], default: S
 															  
 															  
 # Kapcsolok / a pineket meg ki kell talalni
@@ -228,15 +236,12 @@ zprobe.probe_height                          5               # How much above be
 #leveling-strategy.three-point-leveling.probe_offsets  0,0,0       # the probe offsets from nozzle, must be x,y,z, default is no offset
 #leveling-strategy.three-point-leveling.save_plane     false       # set to true to allow the bed plane to be saved with M500 default is false
 
-## Panel
-# See http://smoothieware.org/panel
-# Please find your panel on the wiki and copy/paste the right configuration here
 panel.enable                                 true             # Set to true to enable the panel code
-
 # Example for reprap discount GLCD
 # on glcd EXP1 is to left and EXP2 is to right, pin 1 is bottom left, pin 2 is top left etc.
 # +5v is EXP1 pin 10, Gnd is EXP1 pin 9
-panel.lcd                                   reprap_discount_glcd     #
+panel.lcd                                   reprap_discount_glcd
+panel.encoder_resolution                    4                 # steps / click
 panel.spi_channel                           0                 # SPI channel to use  ; GLCD EXP1 Pins 3,5 (MOSI, SCLK)
 panel.spi_cs_pin                            0.16              # SPI chip select     ; GLCD EXP1 Pin 4
 panel.encoder_a_pin                         3.25!^            # Encoder pin         ; GLCD EXP2 Pin 3
@@ -270,13 +275,13 @@ custom_menu.power_off.command              M81               #
 network.enable                               true            # Enable the ethernet network services
 network.webserver.enable                     true             # Enable the webserver
 network.telnet.enable                        true             # Enable the telnet server
-#network.ip_address                           auto             # Use dhcp to get ip address
+network.ip_address                           auto             # Use dhcp to get ip address
 # Uncomment the 3 below to manually setup ip address
-network.ip_address                           192.168.1.200   # The IP address
-network.ip_mask                              255.255.255.0   # The ip mask
+#network.ip_address                           192.168.1.200   # The IP address
+#network.ip_mask                              255.255.255.0   # The ip mask
 #network.ip_gateway                           192.168.1.1     # The gateway address
 #network.mac_override                         xx.xx.xx.xx.xx.xx  # Override the mac address, only do this if you have a conflict
-#network.hostname                             marogep          #hatha mukodik, ki kene probalni
+network.hostname                             marogep          #hatha mukodik, ki kene probalni
 
 ## System configuration
 # Serial communications configuration ( baud rate defaults to 9600 if undefined )
@@ -289,18 +294,15 @@ second_usb_serial_enable                     false            # This enables a s
 
 # Kill button maybe assigned to a different pin, set to the onboard pin by default
 # See http://smoothieware.org/killbutton
-kill_button_enable                           true             # Set to true to enable a kill button
+kill_button_enable                           false             # Set to true to enable a kill button
 kill_button_pin                              2.12             # Kill button pin. default is same as pause button 2.12 (2.11 is another good choice)
 
 #msd_disable                                 false            # Disable the MSD (USB SDCARD), see http://smoothieware.org/troubleshooting#disable-msd
 #dfu_enable                                  false            # For linux developers, set to true to enable DFU
 
-# Only needed on a smoothieboard
-# See http://smoothieware.org/currentcontrol
-currentcontrol_module_enable                 false             # Control stepper motor current via the configuration file
 
 #jogger settings
-jogger.enable                                   true           #enable jogging functionality
+jogger.enable                                   false           #enable jogging functionality
 jogger.data_source_alpha                        horizontal     #set the first (alpha) joystick name as "horizontal"
 jogger.data_source_beta                         vertical       #set the second (beta) joystick name as "vertical"
 jogger.max_speed                                140            #set the max jogging speed to 1000 mm/sec
@@ -313,7 +315,7 @@ jogger.m_code_toggle                            778            #use M778 to togg
 jogger.jog_axes                                 Xy,XZ,-Z       #cycle between the joystick horz/vert controlling axes XY, XZ, and nothing/Z when using M778
 
 #joystick settings
-joystick.horizontal.enable                     true            #enable the horizontal axis joystick
+joystick.horizontal.enable                     false            #enable the horizontal axis joystick
 joystick.horizontal.pin                        1.30            #use pin 1.30 connected to potentiometer wiper
 joystick.horizontal.endpoint                   3.30            #3.2 V maps to +1 in joystick reading
 joystick.horizontal.auto_zero                  true            #automatically determine the zero point
@@ -321,7 +323,7 @@ joystick.horizontal.startup_time               1000            #take readings fo
 joystick.horizontal.refresh_rate               100             #update the joystick position 100 times per second
 joystick.horizontal.start_value                0               #when auto-zeroing, force joystick output to be 0
 
-joystick.vertical.enable                       true            #enable the vertical axis joystick
+joystick.vertical.enable                       false           #enable the vertical axis joystick
 joystick.vertical.pin                          1.31
 joystick.vertical.endpoint                     3.30
 joystick.vertical.auto_zero                    true
@@ -329,11 +331,11 @@ joystick.vertical.startup_time                 1000
 joystick.vertical.refresh_rate                 100
 joystick.vertical.start_value                  0
 
-soft_endstop.enable   true               # enable soft endstops
-soft_endstop.halt     true               # HALT when soft endstop triggered (safest) when set to false the entire move will just be ignored
-soft_endstop.x_min    0.0                # minimum X
-soft_endstop.y_min    0.0                # minimum Y
-#soft_endstop.z_min    0.0               # minimum Z NOTE leave commented out to disable checking for this axis
-soft_endstop.x_max    1000.0              # maximum X
-soft_endstop.y_max    650.0              # maximum Y
-#soft_endstop.z_max    180.0              # maximum Z NOTE leave commented out to disable checking for this axis
+soft_endstop.enable                            true            # enable soft endstops
+soft_endstop.halt                              true            # HALT when soft endstop triggered (safest) when set to false the entire move will just be ignored
+soft_endstop.x_min                             0.0             # minimum X
+soft_endstop.y_min                             0.0             # minimum Y
+#soft_endstop.z_min                            0.0             # minimum Z NOTE leave commented out to disable checking for this axis
+soft_endstop.x_max                             1000.0          # maximum X
+soft_endstop.y_max                             650.0           # maximum Y
+#soft_endstop.z_max                            180.0           # maximum Z NOTE leave commented out to disable checking for this axis
