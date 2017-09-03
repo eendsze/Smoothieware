@@ -1,18 +1,39 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Smoothie Web</title>
+	<title>Marógép</title>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
   <script type="text/javascript" src="functions.js"></script>
 </head>
 
 <body>
 
-<h1>Szia Árpi</h1>
+<h1>Marógép fájlkezelő</h1>
+
+<br/>
+<button id="pause" onclick="runCommand('suspend', false)">Megállít</button>
+<button id="resume" onclick="runCommand('resume', false)">Tovább</button>
 
 
+<h2> Fájl feltöltés </h2>
+<input type="file" id="files" name="files[]" onchange="upload();">
 
-<h2>Commands</h2>
+<h3>Fájl(ok) feltöltése</h3>
+<output id="list"></output>
+<div id="progress"></div>
+<div id="uploadresult"></div>
+<script>
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+
+<h2> Munkafájlok listája <button id="refreshFiles" onclick="refreshFiles()">Frissít</button> </h2>
+
+<table id="fileList">
+</table>
+
+<br/>
+
+<h2>Parancs küldés (haladóknak)</h2>
 <form action="/command" id="commandForm">
 		<input type="text" name="commandText" placeholder="Send Command...">
 		<input type="submit" value="Send">
@@ -40,26 +61,6 @@
 		});
 	});
 </script>
-
-<h2> Fájl feltöltés </h2>
-<input type="file" id="files" name="files[]" onchange="upload();">
-
-<h3>Fájl(ok) feltöltése</h3>
-<output id="list"></output>
-<div id="progress"></div>
-<div id="uploadresult"></div>
-<script>
-  document.getElementById('files').addEventListener('change', handleFileSelect, false);
-</script>
-
-<h2>Printable File list <button id="refreshFiles" onclick="refreshFiles()">Frissít</button> </h2>
-
-<table id="fileList">
-</table>
-<br/>
-
-<button id="pause" onclick="runCommand('suspend', false)">Megállít</button>
-<button id="resume" onclick="runCommand('resume', false)">Tovább</button>
 
 </body>
 </html>
