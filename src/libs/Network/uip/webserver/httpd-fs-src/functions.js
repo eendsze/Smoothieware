@@ -27,39 +27,6 @@ function runCommandCallback(cmd,callback) {
     var posting = $.post( url, cmd, callback);
 }
 
-function jogXYClick (cmd) {
-  runCommand("G91 G0 " + cmd + " F" + document.getElementById("xy_velocity").value + " G90", true)
-}
-
-function jogZClick (cmd) {
-  runCommand("G91 G0 " + cmd + " F" + document.getElementById("z_velocity").value + " G90", true)
-}
-
-function extrude(event,a,b) {
-  var length = document.getElementById("extrude_length").value;
-  var velocity = document.getElementById("extrude_velocity").value;
-  var direction = (event.currentTarget.id=='extrude')?1:-1;
-  runCommand("G91 G0 E" + (length * direction) + " F" + velocity + " G90", true);
-}
-
-function motorsOff(event) {
-  runCommand("M18", true);
-}
-
-function heatSet(event) {
-  var type = (event.currentTarget.id=='heat_set')?104:140;
-  var temperature = (type==104)?document.getElementById("heat_value").value:document.getElementById("bed_value").value;
-  runCommand("M" + type + " S" + temperature, true);
-}
-
-function heatOff(event) {
-  var type = (event.currentTarget.id=='heat_off')?104:140;
-  runCommand("M" + type + " S0", true);
-}
-function getTemperature () {
-  runCommand("M105", false);
-}
-
 function handleFileSelect(evt) {
     var files = evt.target.files; // handleFileSelectist object
 
@@ -146,19 +113,23 @@ function playFile(filename) {
   runCommandSilent("play /sd/"+filename);
 }
 
+function deleteFile(filename) {
+  runCommandSilent("rm /sd/"+filename);
+}
+
 function refreshFiles() {
   document.getElementById('fileList').innerHTML = '';
   runCommandCallback("M20", function(data){
     $.each(data.split('\n'), function(index) {
       var item = this.trim();
-        if (item.match(/\.g(code)?$/)) {
+        if (item.match(/\.g(code)?$|\.c?nc$/)) {
           var table = document.getElementById('fileList');
           var row = table.insertRow(-1);
           var cell = row.insertCell(0);
           var text = document.createTextNode(item);
           cell.appendChild(text);
           cell = row.insertCell(1);
-          cell.innerHTML = "[<a href='javascript:void(0);' onclick='playFile(\""+item+"\");'>Play</a>]";
+          cell.innerHTML = "[<a href='javascript:void(0);' onclick='deleteFile(\""+item+"\");'>Delete</a>]";
         }
         //$( "#result" ).append( this + '<br/>' );
       });
