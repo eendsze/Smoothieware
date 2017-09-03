@@ -115,6 +115,7 @@ function playFile(filename) {
 
 function deleteFile(filename) {
   runCommandSilent("rm /sd/"+filename);
+  refreshFiles();
 }
 
 function refreshFiles() {

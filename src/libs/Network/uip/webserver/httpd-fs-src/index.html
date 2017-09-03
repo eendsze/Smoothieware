@@ -41,10 +41,10 @@
 	});
 </script>
 
-<h2> Upload File </h2>
+<h2> Fájl feltöltés </h2>
 <input type="file" id="files" name="files[]" onchange="upload();">
 
-<h3>Uploading file(s)</h3>
+<h3>Fájl(ok) feltöltése</h3>
 <output id="list"></output>
 <div id="progress"></div>
 <div id="uploadresult"></div>
@@ -52,13 +52,14 @@
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
 </script>
 
-<h2>Printable File list <button id="refreshFiles" onclick="refreshFiles()">Refresh</button> </h2>
-<br/>
+<h2>Printable File list <button id="refreshFiles" onclick="refreshFiles()">Frissít</button> </h2>
+
 <table id="fileList">
 </table>
+<br/>
 
-<button id="pause" onclick="runCommand('suspend', false)">Pause</button>
-<button id="resume" onclick="runCommand('resume', false)">Resume</button>
+<button id="pause" onclick="runCommand('suspend', false)">Megállít</button>
+<button id="resume" onclick="runCommand('resume', false)">Tovább</button>
 
 </body>
 </html>
