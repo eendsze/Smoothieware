@@ -249,6 +249,7 @@ void Switch::on_gcode_received(void *argument)
     // issuing redundant swicth on calls regularly we need to optimize by making sure the value is actually changing
     // hence we need to do the wait for queue in each case rather than just once at the start
     if(match_input_on_gcode(gcode)) {
+    	this->switch_state = true; //this is for input switches, to be able to change it's state with G-code
         if (this->output_type == SIGMADELTA) {
             // SIGMADELTA output pin turn on (or off if S0)
             if(gcode->has_letter('S')) {
