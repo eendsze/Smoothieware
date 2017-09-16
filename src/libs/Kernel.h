@@ -55,6 +55,9 @@ class Kernel {
         bool get_feed_hold() const { return feed_hold; }
         bool is_feed_hold_enabled() const { return enable_feed_hold; }
 
+        void set_suspended(bool f) {suspended=f; }
+        bool get_suspended() const { return suspended; }
+
         std::string get_query_string();
 
         // These modules are available to all other modules
@@ -85,6 +88,7 @@ class Kernel {
             bool ok_per_line:1;
             bool enable_feed_hold:1;
             bool new_status_format:1;
+            bool suspended:1;
         };
 
 };

@@ -51,10 +51,14 @@ uint32_t PlayLed::led_tick(uint32_t)
         return 0;
     }
 
-    if(++cnt >= 6) { // 6 ticks ~ 500ms
-        cnt= 0;
-        led.set(!THECONVEYOR->is_idle());
-    }
+    if(!THECONVEYOR->is_idle()) {
+    	led.set(true);
+    } else if(THEKERNEL->get_suspended()) {
+       if(++cnt >= 10) { // 6 ticks ~ 500ms
+            cnt= 0;
+            led.set(!led.get());
+   	    }
+    } else led.set(false);
 
     return 0;
 }

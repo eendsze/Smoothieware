@@ -581,6 +581,7 @@ void Player::suspend_part2()
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
     }
 
+    THEKERNEL->set_suspended(true);
     THEKERNEL->streams->printf("// Print Suspended, enter resume to continue printing\n");
 }
 
@@ -685,4 +686,5 @@ void Player::resume_command(string parameters, StreamOutput *stream )
     // clean up
     this->saved_temperatures.clear();
     suspended= false;
+    THEKERNEL->set_suspended(false);
 }

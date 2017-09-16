@@ -59,6 +59,7 @@ Kernel::Kernel()
     halted = false;
     feed_hold = false;
     enable_feed_hold = false;
+    suspended = false;
 
     instance = this; // setup the Singleton instance of the kernel
 
