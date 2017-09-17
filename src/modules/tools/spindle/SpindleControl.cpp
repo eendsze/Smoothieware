@@ -37,7 +37,7 @@ void SpindleControl::on_gcode_received(void *argument)
             get_pid_settings();
           
         }
-        else if (gcode->m == 3) 
+        else if (gcode->m == 3 || gcode->m == 4) //TODO now M3 (CW) and M4 (CCW) is also supported, but runs the same direction
         {
             THECONVEYOR->wait_for_idle();
             // M3: Spindle on
@@ -50,6 +50,8 @@ void SpindleControl::on_gcode_received(void *argument)
             {
                 set_speed(gcode->get_value('S'));
             }
+
+            wait_for_spindle(); //waits for spindle to start
         }
         else if (gcode->m == 5)
         {

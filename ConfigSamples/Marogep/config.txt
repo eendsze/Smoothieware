@@ -35,15 +35,14 @@ switch.pause.input_pin_behavior    toggle                   # This pin toggles b
 after_suspend_gcode                         M701_G91_G0Z10_G90    #The _ character gets converted into space
 before_resume_gcode                         M702         # clear suspend pin state
 
-#Spindle control Switch module
-switch.spindle.enable                            true             #
-switch.spindle.input_on_command                  M3               #
-switch.spindle.input_off_command                 M5               #
-switch.spindle.output_pin                        2.5              #
-switch.spindle.output_type                       digital          #
-#switch.spindle.output_type                       pwm              # pwm output settable with S parameter in the input_on_comand
-switch.spindle.max_pwm                           255              # set max pwm for the pin default is 255
-
+# SPINDLE CONTROL
+spindle.enable                               true
+spindle.type                                 analog               # vannak meg masok is, es azokhoz meg tobb beallitasok
+spindle.pwm_pin                              2.4
+spindle.switch_on_pin                        2.5                  # ez kapcsolja a motort
+spindle.max_rpm                              25000
+spindle.min_rpm                              1000
+spindle.pwm_period                           1000                 # gondolom micro/sec
 
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
@@ -71,16 +70,19 @@ alpha_step_pin                               2.0              # Pin for alpha st
 alpha_dir_pin                                0.5              # Pin for alpha stepper direction, add '!' to reverse direction
 alpha_en_pin                                 0.4              # Pin for alpha enable pin
 alpha_current                                0.11
+alpha_max_rate                               8500             # speed mm/min
 
 beta_step_pin                                2.1              # Pin for beta stepper step signal
 beta_dir_pin                                 0.11             # Pin for beta stepper direction, add '!' to reverse direction
 beta_en_pin                                  0.10             # Pin for beta enable
 beta_current                                 0.11
+beta_max_rate                                8500             # speed mm/min
 
 gamma_step_pin                               2.2              # Pin for gamma stepper step signal
 gamma_dir_pin                                0.20             # Pin for gamma stepper direction, add '!' to reverse direction
 gamma_en_pin                                 0.19             # Pin for gamma enable
 gamma_current                                0.08
+gamma_max_rate                               8500             # speed mm/min
 
 ## Extruder module configuration
 # See http://smoothieware.org/extruder

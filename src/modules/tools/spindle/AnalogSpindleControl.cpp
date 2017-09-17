@@ -122,3 +122,13 @@ void AnalogSpindleControl::update_pwm(float value)
 
 }
 
+void AnalogSpindleControl::wait_for_spindle(void)
+{
+    uint32_t delay_ms = 2000;
+
+    uint32_t start = us_ticker_read(); // mbed call
+    while ((us_ticker_read() - start) < delay_ms * 1000) {
+       THEKERNEL->call_event(ON_IDLE, this);
+       if(THEKERNEL->is_halted()) return;
+    }
+}
