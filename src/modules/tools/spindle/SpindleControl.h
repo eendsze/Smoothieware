@@ -8,7 +8,16 @@
 #ifndef SPINDLE_CONTROL_MODULE_H
 #define SPINDLE_CONTROL_MODULE_H
 
+#include "checksumm.h"
+
 #include "libs/Module.h"
+
+#define spindel_control_data_checksum    CHECKSUM("spindle_control_data")
+
+struct t_spindle_state {
+     int target_speed;
+     bool onstate;
+};
 
 class SpindleControl: public Module {
     public:
@@ -18,9 +27,12 @@ class SpindleControl: public Module {
 
     protected:
         bool spindle_on;
+        int spindle_target_rpm;
 
     private:
         void on_gcode_received(void *argument);
+        void on_get_public_data(void* argument);
+        void on_set_public_data(void* argument);
         
         virtual void turn_on(void) {};
         virtual void turn_off(void) {};

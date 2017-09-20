@@ -64,6 +64,7 @@ class PWMSpindleControl: public SpindleControl {
         void set_i_term(float);
         void set_d_term(float);
         void report_settings(void);
+        void wait_for_spindle(void);
 };
 
 #endif

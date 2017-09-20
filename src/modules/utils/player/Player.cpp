@@ -29,6 +29,7 @@
 #include "TemperatureControlPublicAccess.h"
 #include "TemperatureControlPool.h"
 #include "ExtruderPublicAccess.h"
+#include "SpindleControl.h"
 
 #include <cstddef>
 #include <cmath>
@@ -573,6 +574,7 @@ void Player::suspend_part2()
         }
     }
 
+
     // execute optional gcode if defined
     if(!after_suspend_gcode.empty()) {
         struct SerialMessage message;
@@ -580,6 +582,16 @@ void Player::suspend_part2()
         message.stream = &(StreamOutput::NullStream);
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
     }
+
+    // save spindle state and stop motor
+    struct t_spindle_state sp;
+    bool ok = PublicData::get_value(spindel_control_data_checksum, &sp);
+    if(ok) {
+        spindle_state = sp.onstate;
+        spindle_speed = sp.target_speed;
+        sp.onstate = false;
+        PublicData::set_value(spindel_control_data_checksum, &sp);
+    } else spindle_state = false;
 
     THEKERNEL->set_suspended(true);
     THEKERNEL->streams->printf("// Print Suspended, enter resume to continue printing\n");
@@ -661,9 +673,14 @@ void Player::resume_command(string parameters, StreamOutput *stream )
     THEROBOT->absolute_mode= true;
     {
         // NOTE position was saved in MCS so must use G53 to restore position
+    	// for a CNC 2.5D machine the X,Y must be restored first, and the Z at the end only.
         char buf[128];
-        snprintf(buf, sizeof(buf), "G53 G0 X%f Y%f Z%f", saved_position[0], saved_position[1], saved_position[2]);
         struct SerialMessage message;
+        snprintf(buf, sizeof(buf), "G53 G0 X%f Y%f", saved_position[0], saved_position[1], saved_position[2]);
+        message.message = buf;
+        message.stream = &(StreamOutput::NullStream);
+        THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
+        snprintf(buf, sizeof(buf), "G53 G0 Z%f", saved_position[0], saved_position[1], saved_position[2]);
         message.message = buf;
         message.stream = &(StreamOutput::NullStream);
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
@@ -672,6 +689,12 @@ void Player::resume_command(string parameters, StreamOutput *stream )
 
     // restore extruder state
     PublicData::set_value( extruder_checksum, restore_state_checksum, nullptr );
+
+    // restore spindle state
+    struct t_spindle_state sp;
+    sp.onstate = spindle_state;
+    sp.target_speed = spindle_speed;
+    PublicData::set_value(spindel_control_data_checksum, &sp);
 
     stream->printf("Resuming print\n");
 

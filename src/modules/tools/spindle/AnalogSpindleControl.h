@@ -9,7 +9,6 @@
 #define ANALOG_SPINDLE_MODULE_H
 
 #include "SpindleControl.h"
-#include "us_ticker_api.h"
 
 namespace mbed {
     class PwmOut;

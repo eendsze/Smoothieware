@@ -10,6 +10,7 @@
 #include "Gcode.h"
 #include "Conveyor.h"
 #include "SpindleControl.h"
+#include "PublicDataRequest.h"
 
 void SpindleControl::on_gcode_received(void *argument) 
 {
@@ -49,7 +50,7 @@ void SpindleControl::on_gcode_received(void *argument)
             if (gcode->has_letter('S'))
             {
                 set_speed(gcode->get_value('S'));
-            }
+            } else set_speed(spindle_target_rpm);
 
             wait_for_spindle(); //waits for spindle to start
         }
@@ -63,5 +64,43 @@ void SpindleControl::on_gcode_received(void *argument)
         }
     }
 
+}
+
+void SpindleControl::on_get_public_data(void *argument)
+{
+    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+
+    if(!pdr->starts_with(spindel_control_data_checksum)) return;
+
+    struct t_spindle_state *t= static_cast<t_spindle_state*>(pdr->get_data_ptr());
+    t->onstate = spindle_on;
+    t->target_speed = spindle_target_rpm;
+    pdr->set_taken();
+
+}
+
+void SpindleControl::on_set_public_data(void *argument)
+{
+    PublicDataRequest *pdr = static_cast<PublicDataRequest *>(argument);
+
+    if(!pdr->starts_with(spindel_control_data_checksum)) return;
+
+    struct t_spindle_state *t = static_cast<t_spindle_state*>(pdr->get_data_ptr());
+
+    THECONVEYOR->wait_for_idle();
+    if(t->onstate) {
+        if(!spindle_on) {
+            turn_on();
+        }
+        set_speed(spindle_target_rpm);
+        spindle_target_rpm = t->target_speed;
+        wait_for_spindle(); //waits for spindle to start
+    } else {
+        if(spindle_on) {
+            turn_off();
+        }
+    }
+
+    pdr->set_taken();
 }
 

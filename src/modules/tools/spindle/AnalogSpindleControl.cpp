@@ -14,6 +14,7 @@
 #include "ConfigValue.h"
 #include "StreamOutputPool.h"
 #include "PwmOut.h"
+#include "us_ticker_api.h"
 
 #define spindle_checksum                    CHECKSUM("spindle")
 #define spindle_max_rpm_checksum            CHECKSUM("max_rpm")
@@ -61,6 +62,8 @@ void AnalogSpindleControl::on_module_loaded()
     }
     // register for events
     register_for_event(ON_GCODE_RECEIVED);
+    register_for_event(ON_GET_PUBLIC_DATA);
+    register_for_event(ON_SET_PUBLIC_DATA);
 }
 
 void AnalogSpindleControl::turn_on() 
@@ -99,7 +102,7 @@ void AnalogSpindleControl::set_speed(int rpm)
     }
     // calculate the duty cycle and update the PWM
     update_pwm(1.0f / max_rpm * target_rpm);
-
+    spindle_target_rpm = target_rpm;
 }
 
 

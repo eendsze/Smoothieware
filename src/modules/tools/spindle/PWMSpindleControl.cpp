@@ -106,6 +106,8 @@ void PWMSpindleControl::on_module_loaded()
     THEKERNEL->slow_ticker->attach(UPDATE_FREQ, this, &PWMSpindleControl::on_update_speed);
 
     register_for_event(ON_GCODE_RECEIVED);
+    register_for_event(ON_GET_PUBLIC_DATA);
+    register_for_event(ON_SET_PUBLIC_DATA);
 }
 
 void PWMSpindleControl::on_pin_rise()
@@ -176,6 +178,7 @@ void PWMSpindleControl::turn_off() {
 
 void PWMSpindleControl::set_speed(int rpm) {
     target_rpm = rpm;
+    spindle_target_rpm = rpm;
 }
 
 
@@ -203,5 +206,16 @@ void PWMSpindleControl::set_d_term(float d) {
 void PWMSpindleControl::report_settings() {
     THEKERNEL->streams->printf("P: %0.6f I: %0.6f D: %0.6f\n",
                                control_P_term, control_I_term, control_D_term);
+}
+
+void PWMSpindleControl::wait_for_spindle(void)
+{
+    uint32_t delay_ms = 2000;
+
+    uint32_t start = us_ticker_read(); // mbed call
+    while ((us_ticker_read() - start) < delay_ms * 1000) {
+       THEKERNEL->call_event(ON_IDLE, this);
+       if(THEKERNEL->is_halted()) return;
+    }
 }
 

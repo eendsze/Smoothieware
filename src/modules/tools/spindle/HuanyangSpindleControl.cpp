@@ -127,6 +127,7 @@ void HuanyangSpindleControl::turn_off()
 void HuanyangSpindleControl::set_speed(int target_rpm) 
 {
 
+	spindle_target_rpm = target_rpm;
     // prepare data for the set speed command
     char set_speed_msg[7] = { 0x01, 0x05, 0x02, 0x00, 0x00, 0x00, 0x00 };
     // convert RPM into Hz
