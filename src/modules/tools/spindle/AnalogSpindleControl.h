@@ -39,7 +39,6 @@ class AnalogSpindleControl: public SpindleControl {
         void set_speed(int);
         void report_speed(void);
         void update_pwm(float); 
-        void wait_for_spindle(void);
 };
 
 #endif

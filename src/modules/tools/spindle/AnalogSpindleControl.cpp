@@ -14,7 +14,6 @@
 #include "ConfigValue.h"
 #include "StreamOutputPool.h"
 #include "PwmOut.h"
-#include "us_ticker_api.h"
 
 #define spindle_checksum                    CHECKSUM("spindle")
 #define spindle_max_rpm_checksum            CHECKSUM("max_rpm")
@@ -64,6 +63,7 @@ void AnalogSpindleControl::on_module_loaded()
     register_for_event(ON_GCODE_RECEIVED);
     register_for_event(ON_GET_PUBLIC_DATA);
     register_for_event(ON_SET_PUBLIC_DATA);
+    register_for_event(ON_HALT);
 }
 
 void AnalogSpindleControl::turn_on() 
@@ -123,15 +123,4 @@ void AnalogSpindleControl::update_pwm(float value)
     else
         pwm_pin->write(value);
 
-}
-
-void AnalogSpindleControl::wait_for_spindle(void)
-{
-    uint32_t delay_ms = 2000;
-
-    uint32_t start = us_ticker_read(); // mbed call
-    while ((us_ticker_read() - start) < delay_ms * 1000) {
-       THEKERNEL->call_event(ON_IDLE, this);
-       if(THEKERNEL->is_halted()) return;
-    }
 }
