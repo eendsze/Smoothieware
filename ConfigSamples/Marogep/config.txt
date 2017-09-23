@@ -32,7 +32,7 @@ switch.pause.input_on_command      M701                     # ..nem jo...ha lefu
 switch.pause.input_off_command     M702                     # igazitjak a switch allapotat 
 switch.pause.input_pin_behavior    toggle                   # This pin toggles between it's on and off states each time it is pressed and released
 
-after_suspend_gcode                         M701_G91_G0Z10_G90    #The _ character gets converted into space
+after_suspend_gcode                         M701_G91_G0Z30_G90    #The _ character gets converted into space
 before_resume_gcode                         M702         # clear suspend pin state
 
 # SPINDLE CONTROL
@@ -43,6 +43,7 @@ spindle.switch_on_pin                        2.5                  # ez kapcsolja
 spindle.max_rpm                              25000
 spindle.min_rpm                              1000
 spindle.pwm_period                           1000                 # gondolom micro/sec
+spindle.startup_time                         2000	              # ennyit var a motor felporgesre, ms
 
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
