@@ -676,11 +676,11 @@ void Player::resume_command(string parameters, StreamOutput *stream )
     	// for a CNC 2.5D machine the X,Y must be restored first, and the Z at the end only.
         char buf[128];
         struct SerialMessage message;
-        snprintf(buf, sizeof(buf), "G53 G0 X%f Y%f", saved_position[0], saved_position[1], saved_position[2]);
+        snprintf(buf, sizeof(buf), "G53 G0 X%f Y%f", saved_position[0], saved_position[1]);
         message.message = buf;
         message.stream = &(StreamOutput::NullStream);
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
-        snprintf(buf, sizeof(buf), "G53 G0 Z%f", saved_position[0], saved_position[1], saved_position[2]);
+        snprintf(buf, sizeof(buf), "G53 G0 Z%f", saved_position[2]);
         message.message = buf;
         message.stream = &(StreamOutput::NullStream);
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
