@@ -43,6 +43,9 @@
 #define before_resume_gcode_checksum      CHECKSUM("before_resume_gcode")
 #define leave_heaters_on_suspend_checksum CHECKSUM("leave_heaters_on_suspend")
 
+#define panel_showDRO_checksum     CHECKSUM("show_DRO_sreen")
+#define panel_checksum             CHECKSUM("panel")
+
 extern SDFAT mounter;
 
 Player::Player()
@@ -52,7 +55,7 @@ Player::Player()
     this->booted = false;
     this->elapsed_secs = 0;
     this->reply_stream = nullptr;
-    this->suspended= false;
+    set_suspended(false);
     this->suspend_loops= 0;
 }
 
@@ -78,9 +81,9 @@ void Player::on_module_loaded()
 
 void Player::on_halt(void* argument)
 {
-    if(argument == nullptr && this->playing_file ) {
+//    if(argument == nullptr && this->playing_file ) {
         abort_command("1", &(StreamOutput::NullStream));
-    }
+//    }
 }
 
 void Player::on_second_tick(void *)
@@ -222,7 +225,7 @@ void Player::on_gcode_received(void *argument)
         if(gcode->g == 28) { // homing cancels suspend
             if(this->suspended) {
                 // clean up
-                this->suspended= false;
+                set_suspended(false);
                 THEROBOT->pop_state();
                 this->saved_temperatures.clear();
                 this->was_playing_file= false;
@@ -311,6 +314,8 @@ void Player::play_command( string parameters, StreamOutput *stream )
     }
     this->played_cnt = 0;
     this->elapsed_secs = 0;
+
+    PublicData::set_value( panel_checksum, panel_showDRO_checksum, NULL );
 }
 
 void Player::progress_command( string parameters, StreamOutput *stream )
@@ -359,17 +364,18 @@ void Player::progress_command( string parameters, StreamOutput *stream )
 
 void Player::abort_command( string parameters, StreamOutput *stream )
 {
-    if(!playing_file && current_file_handler == NULL) {
-        stream->printf("Not currently playing\r\n");
-        return;
-    }
-    suspended= false;
+//    if(!playing_file && current_file_handler == NULL) {
+//        stream->printf("Not currently playing\r\n");
+//        return;
+//    }
+    set_suspended(false);
     playing_file = false;
+    was_playing_file = false;
     played_cnt = 0;
     file_size = 0;
     this->filename = "";
     this->current_stream = NULL;
-    fclose(current_file_handler);
+    if(current_file_handler != NULL) fclose(current_file_handler);
     current_file_handler = NULL;
     if(parameters.empty()) {
         // clear out the block queue, will wait until queue is empty
@@ -516,7 +522,7 @@ void Player::suspend_command(string parameters, StreamOutput *stream )
     // override the leave_heaters_on setting
     this->override_leave_heaters_on= (parameters == "h");
 
-    suspended= true;
+    set_suspended(true);
     if( this->playing_file ) {
         // pause an sd print
         this->playing_file = false;
@@ -593,7 +599,6 @@ void Player::suspend_part2()
         PublicData::set_value(spindel_control_data_checksum, &sp);
     } else spindle_state = false;
 
-    THEKERNEL->set_suspended(true);
     THEKERNEL->streams->printf("// Print Suspended, enter resume to continue printing\n");
 }
 
@@ -650,11 +655,17 @@ void Player::resume_command(string parameters, StreamOutput *stream )
                 THEKERNEL->streams->printf("Resume aborted by kill\n");
                 THEROBOT->pop_state();
                 this->saved_temperatures.clear();
-                suspended= false;
+                set_suspended(false);
                 return;
             }
         }
     }
+
+    // restore spindle state
+    struct t_spindle_state sp;
+    sp.onstate = spindle_state;
+    sp.target_speed = spindle_speed;
+    PublicData::set_value(spindel_control_data_checksum, &sp);
 
     // execute optional gcode if defined
     if(!before_resume_gcode.empty()) {
@@ -690,12 +701,6 @@ void Player::resume_command(string parameters, StreamOutput *stream )
     // restore extruder state
     PublicData::set_value( extruder_checksum, restore_state_checksum, nullptr );
 
-    // restore spindle state
-    struct t_spindle_state sp;
-    sp.onstate = spindle_state;
-    sp.target_speed = spindle_speed;
-    PublicData::set_value(spindel_control_data_checksum, &sp);
-
     stream->printf("Resuming print\n");
 
     if(this->was_playing_file) {
@@ -708,6 +713,10 @@ void Player::resume_command(string parameters, StreamOutput *stream )
 
     // clean up
     this->saved_temperatures.clear();
-    suspended= false;
-    THEKERNEL->set_suspended(false);
+    set_suspended(false);
+}
+
+void Player::set_suspended(bool s) {
+	 THEKERNEL->set_suspended(s);
+	 suspended = s;
 }

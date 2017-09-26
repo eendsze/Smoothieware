@@ -39,6 +39,7 @@ class Player : public Module {
         void resume_command( string parameters, StreamOutput* stream );
         string extract_options(string& args);
         void suspend_part2();
+        void set_suspended(bool s);
 
         string filename;
         string after_suspend_gcode;
@@ -57,7 +58,7 @@ class Player : public Module {
             bool on_boot_gcode_enable:1;
             bool booted:1;
             bool playing_file:1;
-            bool suspended:1;
+            bool suspended:1; //don't set directly, use set_suspended()
             bool was_playing_file:1;
             bool leave_heaters_on:1;
             bool override_leave_heaters_on:1;
