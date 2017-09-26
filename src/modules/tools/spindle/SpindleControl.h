@@ -13,6 +13,8 @@
 #include "libs/Module.h"
 
 #define spindel_control_data_checksum    CHECKSUM("spindle_control_data")
+#define spindle_checksum                    CHECKSUM("spindle")
+#define startuptime_checksum                CHECKSUM("startup_time")
 
 struct t_spindle_state {
      int target_speed;
@@ -20,7 +22,8 @@ struct t_spindle_state {
 };
 
 class SpindleControl: public Module {
-    public:
+
+public:
         SpindleControl() {};
         virtual ~SpindleControl() {};
         virtual void on_module_loaded() {};
@@ -28,6 +31,7 @@ class SpindleControl: public Module {
     protected:
         bool spindle_on;
         int spindle_target_rpm;
+        uint32_t delay_ms = 2000;
 
     private:
         void on_gcode_received(void *argument);

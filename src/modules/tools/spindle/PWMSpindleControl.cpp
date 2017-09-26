@@ -57,6 +57,7 @@ void PWMSpindleControl::on_module_loaded()
     control_P_term = THEKERNEL->config->value(spindle_checksum, spindle_control_P_checksum)->by_default(0.0001f)->as_number();
     control_I_term = THEKERNEL->config->value(spindle_checksum, spindle_control_I_checksum)->by_default(0.0001f)->as_number();
     control_D_term = THEKERNEL->config->value(spindle_checksum, spindle_control_D_checksum)->by_default(0.0001f)->as_number();
+    delay_ms = THEKERNEL->config->value(spindle_checksum, startuptime_checksum)->by_default(2000)->as_int();
 
     // Smoothing value is low pass filter time constant in seconds.
     float smoothing_time = THEKERNEL->config->value(spindle_checksum, spindle_control_smoothing_checksum)->by_default(0.1f)->as_number();

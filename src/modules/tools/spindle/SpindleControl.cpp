@@ -16,9 +16,6 @@
 #include "PublicDataRequest.h"
 #include "us_ticker_api.h"
 
-#define spindle_checksum                    CHECKSUM("spindle")
-#define startuptime_checksum                CHECKSUM("startup_time")
-
 
 void SpindleControl::on_gcode_received(void *argument) 
 {
@@ -121,8 +118,6 @@ void SpindleControl::on_halt(void* argument)
 
 void SpindleControl::wait_for_spindle(void)
 {
-    uint32_t delay_ms = THEKERNEL->config->value(spindle_checksum, startuptime_checksum)->by_default(2000)->as_int();
-
     uint32_t start = us_ticker_read(); // mbed call
     while ((us_ticker_read() - start) < delay_ms * 1000) {
        THEKERNEL->call_event(ON_IDLE, this);

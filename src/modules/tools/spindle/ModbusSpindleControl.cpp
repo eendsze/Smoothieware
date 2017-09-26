@@ -43,6 +43,8 @@ void ModbusSpindleControl::on_module_loaded()
         smoothie_pin->as_input();
         dir_pin = port_pin((PortName)smoothie_pin->port_number, smoothie_pin->pin);
 
+        delay_ms = THEKERNEL->config->value(spindle_checksum, startuptime_checksum)->by_default(2000)->as_int();
+
         delete smoothie_pin;
     }
 
