@@ -17,7 +17,6 @@ T{$tool.index} M6
 M600</ToolChange>
   <MOP>{$comment} {$mop.name} {$endcomment}
 {$toolchange}
-{$velocitymode} {$workplane}
 {$mop.header}
 {$spindle} {$s}
 {$blocks}
@@ -25,6 +24,7 @@ M600</ToolChange>
   </MOP>
   <EndRewind />
   <Repeat />
+  <SpindleCCW>M3</SpindleCCW>
   <Drill>{$comment}Debut percage{$endcomment}
 {$g0} Z{$mop.retractheight}
 {$g0} {$x} {$y}
@@ -34,4 +34,5 @@ M600</ToolChange>
  </Drill>
   <MinimumArcLength>0.0001</MinimumArcLength>
   <MaximumArcRadius>10000</MaximumArcRadius>
+  <SuppressParserErrors>true</SuppressParserErrors>
 </PostProcessor>
