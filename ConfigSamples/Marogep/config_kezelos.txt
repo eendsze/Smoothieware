@@ -81,13 +81,14 @@ gamma_steps_per_mm                           315              # Steps per mm for
 # See http://smoothieware.org/motion-control
 acceleration                                 500             # Acceleration in mm/second/second.
 z_acceleration                               500             # Acceleration for Z only moves in mm/s^2, 0 uses acceleration which is the default. DO NOT SET ON A DELTA
-junction_deviation                           0.01             # See http://smoothieware.org/motion-control#junction-deviation
-z_junction_deviation                         -1               # For Z only moves, -1 uses junction_deviation, zero disables junction_deviation on z moves DO NOT SET ON A DELTA
+junction_deviation                           0.01            # See http://smoothieware.org/motion-control#junction-deviation
+z_junction_deviation                         0.05            # For Z only moves. If not defined, uses junction_deviation, zero disables junction_deviation on z moves DO NOT SET ON A DELTA
 
 # Cartesian axis speed limits
+# ...this is real, checked in code
 x_axis_max_speed                             6000             # Maximum speed in mm/min
 y_axis_max_speed                             6000             # Maximum speed in mm/min
-z_axis_max_speed                             4000             # Maximum speed in mm/min
+z_axis_max_speed                             3000             # Maximum speed in mm/min
 
 # Stepper module configuration 
 # Pins are defined as  ports, and pin numbers, appending "!" to the number will invert a pin
@@ -292,11 +293,11 @@ kill_button_pin                              4.28             # Kill button pin.
 jogger.enable                                   true           #enable jogging functionality
 jogger.data_source_alpha                        horizontal     #set the first (alpha) joystick name as "horizontal"
 jogger.data_source_beta                         vertical       #set the second (beta) joystick name as "vertical"
-#jogger.max_speed                                140            #set the max jogging speed, mm/min. If not defined, "default_seek_rate" is used 
+jogger.max_speed                                7000           #set the max jogging speed, mm/min. If not defined, "default_seek_rate" is used 
 jogger.dead_zone                                0.05           #set the joystick dead-zone to 0.05. Increase if undesired jogging occurs
 jogger.nonlinearity                             2.0            #set the joystick nonlinearity (see documentation)
-jogger.refresh_rate                             20            #refresh the joystick readings 100 times per second
-jogger.segment_frequency                        20            #submit 100 small movements per second while jogging
+jogger.refresh_rate                             20            #refresh the joystick readings ... times per second
+jogger.step_frequency                           20            #submit ... small movements per second while jogging
 jogger.m_code_set                               777            #use M777 ... to set the current jog axes. M777 XY, M777 -Z
 jogger.m_code_toggle                            778            #use M778 to toggle between the modes below
 jogger.jog_axes                                 XY,-Z          #cycle between the joystick horz/vert controlling axes XY, XZ, and nothing/Z when using M778
@@ -304,15 +305,15 @@ jogger.jog_axes                                 XY,-Z          #cycle between th
 #joystick settings
 joystick.horizontal.enable                     true            #enable the horizontal axis joystick
 joystick.horizontal.pin                        1.31            #use pin 1.30 connected to potentiometer wiper
-joystick.horizontal.endpoint                   3.30            #3.3 V maps to +1 in joystick reading
+joystick.horizontal.endpoint                   3.20            #3.3 V maps to +1 in joystick reading
 joystick.horizontal.auto_zero                  true            #automatically determine the zero point
 joystick.horizontal.startup_time               1000            #take readings for 1 second at startup to get auto-zero point
-joystick.horizontal.refresh_rate               20             #update the joystick position 100 times per second
+joystick.horizontal.refresh_rate               20             #update the joystick position ... times per second
 joystick.horizontal.start_value                0               #when auto-zeroing, force joystick output to be 0
 
 joystick.vertical.enable                       true           #enable the vertical axis joystick
 joystick.vertical.pin                          1.30
-joystick.vertical.endpoint                     3.30
+joystick.vertical.endpoint                     3.20
 joystick.vertical.auto_zero                    true
 joystick.vertical.startup_time                 1000
 joystick.vertical.refresh_rate                 20
