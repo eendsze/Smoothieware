@@ -87,9 +87,9 @@ void WatchScreen::on_refresh()
         }
     }
 
-    // Update Only every 20 refreshes, 1 a second
+    // Update Only every ... refreshes
     update_counts++;
-    if ( update_counts % 20 == 0 ) {
+    if ( update_counts % 2 == 0 ) {
         get_sd_play_info();
         get_wpos();
         get_current_status();

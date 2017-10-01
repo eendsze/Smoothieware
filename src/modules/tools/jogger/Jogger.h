@@ -44,6 +44,10 @@ private:
         bool do_reading:1; //flag for when a joystick reading should occur
     };
 
+    float max_speeds_x{0.0};
+    float max_speeds_y{0.0};
+    float max_speeds_z{0.0};
+
     int refresh_rate{ 100 }; //number of jog speed updates per second (absolute max = base_step_frequency (100 kHz))
     int segment_frequency{ 100 }; //approximate number of segments per second during jogging
 

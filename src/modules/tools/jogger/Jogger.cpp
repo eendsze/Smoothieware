@@ -33,6 +33,10 @@
 #define axis4_data_source_checksum          CHECKSUM("data_source_epsilon")
 #define axis5_data_source_checksum          CHECKSUM("data_source_zeta")
 
+#define  x_axis_max_speed_checksum           CHECKSUM("x_axis_max_speed")
+#define  y_axis_max_speed_checksum           CHECKSUM("y_axis_max_speed")
+#define  z_axis_max_speed_checksum           CHECKSUM("z_axis_max_speed")
+
 #define m_code_set_checksum                 CHECKSUM("m_code_set")
 #define m_code_toggle_checksum              CHECKSUM("m_code_toggle")
 #define jog_axes_checksum                   CHECKSUM("jog_axes")
@@ -68,6 +72,7 @@ void Jogger::on_module_loaded()
     this->register_for_event(ON_MAIN_LOOP);
 
     //ask the kernel to run "update_tick" at "refresh_rate" Hz
+    this->refresh_rate = THEKERNEL->config->value(jogger_checksum, refresh_rate_checksum)->by_default(this->refresh_rate)->as_number();
     THEKERNEL->slow_ticker->attach(this->refresh_rate, this, &Jogger::update_tick);
 
 }
@@ -113,29 +118,35 @@ void Jogger::on_gcode_received(void *argument)
 void Jogger::on_config_reload(void *argument)
 {
     //load the basic configuration settings
-    this->max_speed = THEKERNEL->config->value(default_seek_rate_checksum)->by_default(this->max_speed)->as_number();
-    this->max_speed = THEKERNEL->config->value(jogger_checksum, max_speed_checksum)->by_default(this->max_speed)->as_number();
-    this->dead_zone = THEKERNEL->config->value(jogger_checksum, dead_zone_checksum)->by_default(this->dead_zone)->as_number();
-    this->nonlinearity = THEKERNEL->config->value(jogger_checksum, nonlinearity_checksum)->by_default(this->nonlinearity)->as_number();
-    this->refresh_rate = THEKERNEL->config->value(jogger_checksum, refresh_rate_checksum)->by_default(this->refresh_rate)->as_number();
-    this->segment_frequency = THEKERNEL->config->value(jogger_checksum, segment_frequency_checksum)->by_default(this->segment_frequency)->as_number();
-    this->m_code_set = THEKERNEL->config->value(jogger_checksum, m_code_set_checksum)->by_default(this->m_code_set)->as_number();
-    this->m_code_toggle = THEKERNEL->config->value(jogger_checksum, m_code_toggle_checksum)->by_default(this->m_code_toggle)->as_number();
+    max_speed = THEKERNEL->config->value(default_seek_rate_checksum)->by_default(this->max_speed)->as_number();
+    max_speed = THEKERNEL->config->value(jogger_checksum, max_speed_checksum)->by_default(this->max_speed)->as_number();
+    dead_zone = THEKERNEL->config->value(jogger_checksum, dead_zone_checksum)->by_default(this->dead_zone)->as_number();
+    nonlinearity = THEKERNEL->config->value(jogger_checksum, nonlinearity_checksum)->by_default(this->nonlinearity)->as_number();
+    refresh_rate = THEKERNEL->config->value(jogger_checksum, refresh_rate_checksum)->by_default(this->refresh_rate)->as_number();
+    segment_frequency = THEKERNEL->config->value(jogger_checksum, segment_frequency_checksum)->by_default(this->segment_frequency)->as_number();
+    m_code_set = THEKERNEL->config->value(jogger_checksum, m_code_set_checksum)->by_default(this->m_code_set)->as_number();
+    m_code_toggle = THEKERNEL->config->value(jogger_checksum, m_code_toggle_checksum)->by_default(this->m_code_toggle)->as_number();
+
+    max_speeds_x  = THEKERNEL->config->value(x_axis_max_speed_checksum    )->by_default(60000.0F)->as_number();
+    max_speeds_y  = THEKERNEL->config->value(y_axis_max_speed_checksum    )->by_default(60000.0F)->as_number();
+    max_speeds_z  = THEKERNEL->config->value(z_axis_max_speed_checksum    )->by_default(  300.0F)->as_number();
+
+
     
     //load the names of the joystick modules where each axis will get its data
     uint16_t axisN_data_source_checksum[] = { axis0_data_source_checksum, axis1_data_source_checksum, axis2_data_source_checksum, axis3_data_source_checksum, axis4_data_source_checksum, axis5_data_source_checksum };
     for (int i = 0; i < NUM_JOG_AXES; i++) {
-        this->axis_data_source[i] = get_checksum(THEKERNEL->config->value(jogger_checksum, axisN_data_source_checksum[i])->by_default("")->as_string());
+        axis_data_source[i] = get_checksum(THEKERNEL->config->value(jogger_checksum, axisN_data_source_checksum[i])->by_default("")->as_string());
     }
 
     //load the machine axis letters that the joystick will control
     std::string letterlist = THEKERNEL->config->value(jogger_checksum, jog_axes_checksum)->by_default("XYZABC")->as_string();
 
     //parse the letter list into substrings
-    this->jog_axes = split(letterlist.c_str(), ',');
+    jog_axes = split(letterlist.c_str(), ',');
 
     //update the current machine axis settings
-    update_Axes(this->jog_axes[this->axis_index]);
+    update_Axes(jog_axes[axis_index]);
 }
 
 //map a position from -1 to 1 into a speed from -max to max
@@ -148,6 +159,8 @@ float Jogger::get_speed(float pos) {
     }
     else {
         //apply non-linear scaling to position
+    	if(pos > 0.0) pos -= dead_zone + 0.001;
+    	else pos += dead_zone - 0.001;
         speed = (sign(pos) * pow(abs(pos), this->nonlinearity)) * this->max_speed;
     }
 
@@ -169,11 +182,11 @@ void Jogger::on_main_loop(void *argument)
     if (this->do_reading) {
         //flag was set, means it's time to update the joystick reading
         update_Joystick();
+        //update the jogging functionality
+        update_Jogging();
+
         this->do_reading = false;
     }
-
-    //update the jogging functionality
-    update_Jogging();
 
 }
 
@@ -263,12 +276,30 @@ std::string Jogger::get_Gcode(void)
     //get the magnitude of the speed (sqrt of sum of axis speeds squared)
     float spd = 0.0f;
     for (int c = 0; c < NUM_JOG_AXES; c++) {
-        spd += (this->target_speed[c] * this->target_speed[c]);
+    	//we need to maximize speed here, as only here we see the attached axes
+    	float spd_lim;
+    	switch (axis_letter[c]) {
+        	case 'X':
+        		spd_lim = max_speeds_x;
+        		break;
+        	case 'Y':
+        		spd_lim = max_speeds_y;
+        		break;
+        	case 'Z':
+        		spd_lim = max_speeds_z;
+        		break;
+        	default:
+        		spd_lim = max_speed;
+    	}
+    	if(axis_letter[c] == 'Z'){
+    		if(target_speed[c] > spd_lim) target_speed[c] = spd_lim;
+    		if(target_speed[c] < -spd_lim) target_speed[c] = -spd_lim;
+    	}
+    	spd += (target_speed[c] * target_speed[c]);
     }
     spd = sqrtf(spd);
 
-    //use segment frequency (f) to calculate step scale factor (ssf (mm/segment) = speed (mm/s) / f (segments/s))
-    float ssf = spd / 60.0f / this->segment_frequency;
+    float spd_mult = 1.0 / 60.0f / this->segment_frequency;
 
     //build the Gcode up
     char command[64];
@@ -290,11 +321,11 @@ std::string Jogger::get_Gcode(void)
         }
 
         //append the machine axis letter and its required distance
-        n += snprintf(command + n, sizeof(command) - n, " %c%1.2f", this->axis_letter[i], this->position[i] * ssf);
+        n += snprintf(command + n, sizeof(command) - n, " %c%1.3f", axis_letter[i], target_speed[i] * spd_mult);
     }
 
     //append a feedrate command
-    n += snprintf(command + n, sizeof(command) - n, " F%1.1f", spd);
+    n += snprintf(command + n, sizeof(command) - n, " F%1.2f", spd);
 
     //return the string
     std::string g(command, n);
