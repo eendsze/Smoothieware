@@ -56,8 +56,8 @@ switch.bt7.output_off_command             M117
 
 switch.bt4.enable                         true                     # Enable this module
 switch.bt4.input_pin                      1.23!                    
-switch.bt4.output_on_command              M117_bt4
-switch.bt4.output_off_command             M117 
+switch.bt4.output_on_command              G10_L20_P0_X0_Y0
+#switch.bt4.output_off_command             
 
 
 # SPINDLE CONTROL
@@ -247,14 +247,9 @@ panel.gamma_jog_feedrate                     1000              # Z jogging feedr
 
 ## Custom menus : Example of a custom menu entry, which will show up in the Custom entry.
 # NOTE _ gets converted to space in the menu and commands, | is used to separate multiple commands
-custom_menu.power_on.enable                true              #
-custom_menu.power_on.name                  Power_on          #
-custom_menu.power_on.command               M80               #
-
-custom_menu.power_off.enable               true              #
-custom_menu.power_off.name                 Power_off         #
-custom_menu.power_off.command              M81               #
-
+custom_menu.goto_home.enable                true
+custom_menu.goto_home.name                  Goto_home
+custom_menu.goto_home.command               G0_X0_Y0
 
 ## Network settings
 # See http://smoothieware.org/network
@@ -323,7 +318,7 @@ soft_endstop.enable                            true            # enable soft end
 soft_endstop.halt                              false            # HALT when soft endstop triggered (safest) when set to false the entire move will just be ignored
 soft_endstop.x_min                             0.0             # minimum X
 soft_endstop.y_min                             0.0             # minimum Y
-#soft_endstop.z_min                            0.0             # minimum Z NOTE leave commented out to disable checking for this axis
+soft_endstop.z_min                             0.0             # minimum Z NOTE leave commented out to disable checking for this axis
 soft_endstop.x_max                             180.0          # maximum X
 soft_endstop.y_max                             165.0           # maximum Y
 soft_endstop.z_max                             170.0           # maximum Z NOTE leave commented out to disable checking for this axis
