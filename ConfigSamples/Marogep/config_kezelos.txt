@@ -39,6 +39,27 @@ switch.pause.input_pin_behavior             toggle                   # This pin 
 after_suspend_gcode                         M701_G91_G0Z30_G90    #The _ character gets converted into space
 before_resume_gcode                         M702_M117         # clear suspend pin state, clear display message
 
+switch.jogax.enable                         true                     # Enable this module
+switch.jogax.input_pin                      2.12!                    
+switch.jogax.output_on_command              M777_-Z
+switch.jogax.output_off_command             M777_XY 
+
+switch.bt6.enable                         true                     # Enable this module
+switch.bt6.input_pin                      2.13!                    
+switch.bt6.output_on_command              M117_bt6
+switch.bt6.output_off_command             M117 
+
+switch.bt7.enable                         true                     # Enable this module
+switch.bt7.input_pin                      2.8!                    
+switch.bt7.output_on_command              M117_bt7
+switch.bt7.output_off_command             M117 
+
+switch.bt4.enable                         true                     # Enable this module
+switch.bt4.input_pin                      1.23!                    
+switch.bt4.output_on_command              M117_bt4
+switch.bt4.output_off_command             M117 
+
+
 # SPINDLE CONTROL
 spindle.enable                               true
 spindle.type                                 analog               # vannak meg masok is, es azokhoz meg tobb beallitasok
@@ -78,13 +99,13 @@ alpha_current                                0.11
 alpha_max_rate                               8500             # speed mm/min
 
 beta_step_pin                                2.1              # Pin for beta stepper step signal
-beta_dir_pin                                 0.11             # Pin for beta stepper direction, add '!' to reverse direction
+beta_dir_pin                                 0.11!             # Pin for beta stepper direction, add '!' to reverse direction
 beta_en_pin                                  0.10             # Pin for beta enable
 beta_current                                 0.11
 beta_max_rate                                8500             # speed mm/min
 
 gamma_step_pin                               2.2              # Pin for gamma stepper step signal
-gamma_dir_pin                                0.20             # Pin for gamma stepper direction, add '!' to reverse direction
+gamma_dir_pin                                0.20!             # Pin for gamma stepper direction, add '!' to reverse direction
 gamma_en_pin                                 0.19             # Pin for gamma enable
 gamma_current                                0.08
 gamma_max_rate                               8500             # speed mm/min
@@ -213,8 +234,8 @@ panel.spi_channel                           0                 # SPI channel to u
 panel.spi_cs_pin                            0.16              # SPI chip select     ; GLCD EXP1 Pin 4
 panel.encoder_a_pin                         3.25!            # Encoder pin         ; GLCD EXP2 Pin 3
 panel.encoder_b_pin                         3.26!            # Encoder pin         ; GLCD EXP2 Pin 5
-panel.click_button_pin                      0.28!            # Click button        ; GLCD EXP1 Pin 2
-panel.buzz_pin                              NC               # Pin for buzzer      ; GLCD EXP1 Pin 1
+panel.click_button_pin                      2.11!            # Click button        ; 
+panel.buzz_pin                              NC               # Pin for buzzer      ; 
 #panel.back_button_pin                       2.11!^            # Back button         ; GLCD EXP2 Pin 8
 
 panel.menu_offset                            0                 # Some panels will need 1 here
@@ -261,7 +282,7 @@ play_led_pin                                 4.29!            # a boardon nincs 
 # See http://smoothieware.org/killbutton
 # Kill can be cleared by holding down the kill button for 2 seconds or more.
 kill_button_enable                           true             # Set to true to enable a kill button
-kill_button_pin                              4.28!            # Kill button pin. 
+kill_button_pin                              4.28             # Kill button pin. 
 
 #msd_disable                                 false            # Disable the MSD (USB SDCARD), see http://smoothieware.org/troubleshooting#disable-msd
 #dfu_enable                                  false            # For linux developers, set to true to enable DFU
@@ -282,7 +303,7 @@ jogger.jog_axes                                 XY,-Z          #cycle between th
 
 #joystick settings
 joystick.horizontal.enable                     true            #enable the horizontal axis joystick
-joystick.horizontal.pin                        1.30            #use pin 1.30 connected to potentiometer wiper
+joystick.horizontal.pin                        1.31            #use pin 1.30 connected to potentiometer wiper
 joystick.horizontal.endpoint                   3.30            #3.3 V maps to +1 in joystick reading
 joystick.horizontal.auto_zero                  true            #automatically determine the zero point
 joystick.horizontal.startup_time               1000            #take readings for 1 second at startup to get auto-zero point
@@ -290,7 +311,7 @@ joystick.horizontal.refresh_rate               20             #update the joysti
 joystick.horizontal.start_value                0               #when auto-zeroing, force joystick output to be 0
 
 joystick.vertical.enable                       true           #enable the vertical axis joystick
-joystick.vertical.pin                          1.31
+joystick.vertical.pin                          1.30
 joystick.vertical.endpoint                     3.30
 joystick.vertical.auto_zero                    true
 joystick.vertical.startup_time                 1000
