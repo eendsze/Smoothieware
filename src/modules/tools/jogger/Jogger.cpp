@@ -49,6 +49,9 @@ Jogger::Jogger() {
         this->position[c] = 0.0f;
         this->target_speed[c] = 0.0f;
     }
+    is_active = false;
+    is_jogging = false;
+
 }
 
 //TODO: find examples of other modules, determine if necessary
@@ -251,6 +254,12 @@ void Jogger::update_Jogging(void)
                 //save the current robot state (abs/rel mode, seek rate)
                 THEROBOT->push_state();
 
+                //save the set relative speed, and reset it
+                stored_secpermin = THEROBOT->get_seconds_per_minute();
+                {
+                    Gcode gc("M220 S100", &(StreamOutput::NullStream));
+                    THEKERNEL->call_event(ON_GCODE_RECEIVED, &gc);
+                }
                 //change the mode to relative with G91
                 Gcode gcrel("G91", &(StreamOutput::NullStream));
                 THEKERNEL->call_event(ON_GCODE_RECEIVED, &gcrel);
@@ -263,6 +272,13 @@ void Jogger::update_Jogging(void)
         if (THECONVEYOR->is_idle()) {
             this->is_jogging = false;
 
+            //restore relative speed
+            {
+                char buf[16];
+                snprintf(buf, sizeof(buf), "M 220 S%f", 6000.0 / stored_secpermin);
+                Gcode gc(buf, &(StreamOutput::NullStream));
+                THEKERNEL->call_event(ON_GCODE_RECEIVED, &gc);
+            }
             //restore the robot's state before jogging (abs/rel mode, seek rate)
             THEROBOT->pop_state();
         }
