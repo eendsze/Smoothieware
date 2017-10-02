@@ -88,6 +88,7 @@ class Robot : public Module {
             bool is_g123:1;
             bool soft_endstop_enabled:1;
             bool soft_endstop_halt:1;
+            bool soft_endstop_stopplay:1;
             uint8_t plane_axis_0:2;                           // Current plane ( XY, XZ, YZ )
             uint8_t plane_axis_1:2;
             uint8_t plane_axis_2:2;

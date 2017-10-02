@@ -43,8 +43,9 @@
 #define before_resume_gcode_checksum      CHECKSUM("before_resume_gcode")
 #define leave_heaters_on_suspend_checksum CHECKSUM("leave_heaters_on_suspend")
 
-#define panel_showDRO_checksum     CHECKSUM("show_DRO_sreen")
 #define panel_checksum             CHECKSUM("panel")
+#define panel_showDRO_checksum     CHECKSUM("show_DRO_sreen")
+#define panel_display_message_checksum CHECKSUM("display_message")
 
 extern SDFAT mounter;
 
@@ -81,9 +82,9 @@ void Player::on_module_loaded()
 
 void Player::on_halt(void* argument)
 {
-//    if(argument == nullptr && this->playing_file ) {
+    if(argument == nullptr ) {
         abort_command("1", &(StreamOutput::NullStream));
-//    }
+    }
 }
 
 void Player::on_second_tick(void *)
@@ -377,6 +378,14 @@ void Player::abort_command( string parameters, StreamOutput *stream )
     this->current_stream = NULL;
     if(current_file_handler != NULL) fclose(current_file_handler);
     current_file_handler = NULL;
+
+    // stop the spindle, for sure.
+    spindle_state = false;
+    struct t_spindle_state sp;
+    sp.onstate = false;
+    sp.target_speed = 0;
+    PublicData::set_value(spindel_control_data_checksum, &sp);
+
     if(parameters.empty()) {
         // clear out the block queue, will wait until queue is empty
         // MUST be called in on_main_loop to make sure there are no blocked main loops waiting to put something on the queue
@@ -493,6 +502,12 @@ void Player::on_set_public_data(void *argument)
 
     if(pdr->second_element_is(abort_play_checksum)) {
         abort_command("", &(StreamOutput::NullStream));
+
+        if(pdr->get_data_ptr() != NULL) {
+        	suspend_command("", &(StreamOutput::NullStream));
+            string str{"Abort - endstop"};
+            PublicData::set_value( panel_checksum, panel_display_message_checksum, &str );
+        }
         pdr->set_taken();
     }
 }

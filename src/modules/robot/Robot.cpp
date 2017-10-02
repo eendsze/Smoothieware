@@ -42,6 +42,10 @@
 #include <string>
 #include <algorithm>
 
+#include "modules/utils/player/PlayerPublicAccess.h"
+#include "Panel.h"
+
+
 #define  default_seek_rate_checksum          CHECKSUM("default_seek_rate")
 #define  default_feed_rate_checksum          CHECKSUM("default_feed_rate")
 #define  mm_per_line_segment_checksum        CHECKSUM("mm_per_line_segment")
@@ -90,6 +94,7 @@
 
 #define enable_checksum                    CHECKSUM("enable")
 #define halt_checksum                      CHECKSUM("halt")
+#define stopplay_checksum                  CHECKSUM("stopsd")
 #define soft_endstop_checksum              CHECKSUM("soft_endstop")
 #define xmin_checksum                      CHECKSUM("x_min")
 #define ymin_checksum                      CHECKSUM("y_min")
@@ -275,6 +280,7 @@ void Robot::load_config()
 
     soft_endstop_enabled= THEKERNEL->config->value(soft_endstop_checksum, enable_checksum)->by_default(false)->as_bool();
     soft_endstop_halt= THEKERNEL->config->value(soft_endstop_checksum, halt_checksum)->by_default(true)->as_bool();
+    soft_endstop_stopplay= THEKERNEL->config->value(soft_endstop_checksum, stopplay_checksum)->by_default(true)->as_bool();
 
     soft_endstop_min[X_AXIS]= THEKERNEL->config->value(soft_endstop_checksum, xmin_checksum)->by_default(NAN)->as_number();
     soft_endstop_min[Y_AXIS]= THEKERNEL->config->value(soft_endstop_checksum, ymin_checksum)->by_default(NAN)->as_number();
@@ -1167,8 +1173,15 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
                 //} else if(soft_endstop_truncate) {
                     // TODO VERY hard to do need to go back and change the target, and calculate intercept with the edge
                     // and store all preceding vectors that have on eor more points ourtside of bounds so we can create a propper clip against the boundaries
-
+                } else if(soft_endstop_stopplay) {
+                	// stops SD play, only if not suspended
+                	if(THEPANEL->is_playing() && !THEPANEL->is_suspended()) {
+                		//stop playing.
+                		PublicData::set_value(player_checksum, abort_play_checksum, (void*)1);
+                	}
+                	goto ignore;
                 } else {
+ignore:
                     // ignore it
                     THEKERNEL->streams->printf("WARNING Soft Endstop %c was exceeded - entire move ignored\n", i+'X');
                     return false;
@@ -1629,3 +1642,6 @@ bool Robot::is_homed(uint8_t i) const
     if(!ok) return false;
     return homed[i];
 }
+
+
+
