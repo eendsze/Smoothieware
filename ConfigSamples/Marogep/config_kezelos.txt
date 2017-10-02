@@ -251,6 +251,11 @@ custom_menu.goto_home.enable                true
 custom_menu.goto_home.name                  Goto_home
 custom_menu.goto_home.command               G0_X0_Y0
 
+custom_menu.res_spd.enable                  true
+custom_menu.res_spd.name                    Reset_speed
+custom_menu.res_spd.command                 M220_S100
+
+
 ## Network settings
 # See http://smoothieware.org/network
 network.enable                               true            # Enable the ethernet network services
@@ -315,10 +320,11 @@ joystick.vertical.refresh_rate                 20
 joystick.vertical.start_value                  0
 
 soft_endstop.enable                            true            # enable soft endstops
-soft_endstop.halt                              false            # HALT when soft endstop triggered (safest) when set to false the entire move will just be ignored
+soft_endstop.halt                              false           # HALT when soft endstop triggered (safest) when set to false the entire move will just be ignored
+soft_endstop.stopsd                            true            # stops SD play. If suspended, has no effect
 soft_endstop.x_min                             0.0             # minimum X
 soft_endstop.y_min                             0.0             # minimum Y
 soft_endstop.z_min                             0.0             # minimum Z NOTE leave commented out to disable checking for this axis
-soft_endstop.x_max                             180.0          # maximum X
+soft_endstop.x_max                             180.0           # maximum X
 soft_endstop.y_max                             165.0           # maximum Y
 soft_endstop.z_max                             170.0           # maximum Z NOTE leave commented out to disable checking for this axis
