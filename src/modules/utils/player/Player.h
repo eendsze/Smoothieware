@@ -63,6 +63,7 @@ class Player : public Module {
             bool leave_heaters_on:1;
             bool override_leave_heaters_on:1;
             bool spindle_state:1;
+        bool suspend_abort :1; //means that suspend also aborts file playing. used by soft endstops
             uint8_t suspend_loops:4;
         };
         int spindle_speed;

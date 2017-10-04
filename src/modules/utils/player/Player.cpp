@@ -502,11 +502,12 @@ void Player::on_set_public_data(void *argument)
 
     if(pdr->second_element_is(abort_play_checksum)) {
         abort_command("", &(StreamOutput::NullStream));
-
-        if(pdr->get_data_ptr() != NULL) {
-        	suspend_command("", &(StreamOutput::NullStream));
-            string str{"Abort - endstop"};
-            PublicData::set_value( panel_checksum, panel_display_message_checksum, &str );
+        pdr->set_taken();
+    } else if (pdr->second_element_is(suspend_checksum)) {
+        if (pdr->get_data_ptr() != NULL) {
+            suspend_command("a", &(StreamOutput::NullStream));
+        } else {
+            suspend_command("", &(StreamOutput::NullStream));
         }
         pdr->set_taken();
     }
@@ -535,17 +536,29 @@ void Player::suspend_command(string parameters, StreamOutput *stream )
     stream->printf("Suspending print, waiting for queue to empty...\n");
 
     // override the leave_heaters_on setting
-    this->override_leave_heaters_on= (parameters == "h");
+    override_leave_heaters_on = (parameters.find('h') != string::npos);
+    suspend_abort = (parameters.find('a') != string::npos);
 
     set_suspended(true);
     if( this->playing_file ) {
-        // pause an sd print
-        this->playing_file = false;
-        this->was_playing_file= true;
+        if (!suspend_abort) { // pause an sd print
+            playing_file = false;
+            was_playing_file = true;
+        } else { // abort playing
+            playing_file = false;
+            was_playing_file = false;
+            played_cnt = 0;
+            file_size = 0;
+            filename = "";
+            current_stream = NULL;
+            if (current_file_handler != NULL)
+                fclose(current_file_handler);
+            current_file_handler = NULL;
+        }
     }else{
         // send pause to upstream host, we send it on all ports as we don't know which it is on
         THEKERNEL->streams->printf("// action:pause\r\n");
-        this->was_playing_file= false;
+        was_playing_file= false;
     }
 
     // we need to allow main loop to cycle a few times to clear any buffered commands in the serial streams etc
@@ -562,13 +575,23 @@ void Player::suspend_part2()
 
     THEKERNEL->streams->printf("// Saving current state...\n");
 
+    if(suspend_abort) {
+        string str{"Abort - endstop"};
+        PublicData::set_value( panel_checksum, panel_display_message_checksum, &str );
+        // clear out the block queue, will wait until queue is empty
+        // MUST be called in on_main_loop to make sure there are no blocked main loops waiting to put something on the queue
+        THEKERNEL->conveyor->flush_queue();
+        // now the position will think it is at the last received pos, so we need to do FK to get the actuator position and reset the current position
+        THEROBOT->reset_position_from_current_actuator_position();
+    }
+
     // save current XYZ position
     THEROBOT->get_axis_position(this->saved_position);
 
     // save current extruder state
     PublicData::set_value( extruder_checksum, save_state_checksum, nullptr );
 
-    // save state use M120
+    // save state
     THEROBOT->push_state();
 
     // TODO retract by optional amount...
@@ -613,6 +636,8 @@ void Player::suspend_part2()
         sp.onstate = false;
         PublicData::set_value(spindel_control_data_checksum, &sp);
     } else spindle_state = false;
+
+    if(suspend_abort) spindle_state = false;
 
     THEKERNEL->streams->printf("// Print Suspended, enter resume to continue printing\n");
 }

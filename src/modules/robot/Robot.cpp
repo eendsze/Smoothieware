@@ -1177,7 +1177,8 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
                 	// stops SD play, only if not suspended
                 	if(THEPANEL->is_playing() && !THEPANEL->is_suspended()) {
                 		//stop playing.
-                		PublicData::set_value(player_checksum, abort_play_checksum, (void*)1);
+                        PublicData::set_value(player_checksum, suspend_checksum, (void*)1);
+                        THEKERNEL->streams->printf("WARNING Soft Endstop %c was exceeded - SD play aborted\n", i+'X');
                 	}
                 	goto ignore;
                 } else {

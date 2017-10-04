@@ -5,6 +5,7 @@
 #define is_playing_checksum       CHECKSUM("is_playing")
 #define is_suspended_checksum     CHECKSUM("is_suspended")
 #define abort_play_checksum       CHECKSUM("abort_play")
+#define suspend_checksum          CHECKSUM("suspend")
 #define get_progress_checksum     CHECKSUM("progress")
 
 struct pad_progress {
