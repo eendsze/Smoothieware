@@ -255,6 +255,10 @@ custom_menu.res_spd.enable                  true
 custom_menu.res_spd.name                    Reset_speed
 custom_menu.res_spd.command                 M220_S100
 
+custom_menu.clr_ovrd.enable                 true
+custom_menu.clr_ovrd.name                   Clear_override
+custom_menu.clr_ovrd.command                M502
+
 
 ## Network settings
 # See http://smoothieware.org/network
