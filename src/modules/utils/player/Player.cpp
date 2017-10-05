@@ -586,7 +586,7 @@ void Player::suspend_part2()
     }
 
     // save current XYZ position
-    THEROBOT->get_axis_position(this->saved_position);
+    THEROBOT->get_axis_position(saved_position);
 
     // save current extruder state
     PublicData::set_value( extruder_checksum, save_state_checksum, nullptr );
@@ -596,8 +596,8 @@ void Player::suspend_part2()
 
     // TODO retract by optional amount...
 
-    this->saved_temperatures.clear();
-    if(!this->leave_heaters_on && !this->override_leave_heaters_on) {
+    saved_temperatures.clear();
+    if(!leave_heaters_on && !override_leave_heaters_on) {
         // save current temperatures, get a vector of all the controllers data
         std::vector<struct pad_temperature> controllers;
         bool ok = PublicData::get_value(temperature_control_checksum, poll_controls_checksum, &controllers);
@@ -606,13 +606,13 @@ void Player::suspend_part2()
             for (auto &c : controllers) {
                 // TODO see if in exclude list
                 if(c.target_temperature > 0) {
-                    this->saved_temperatures[c.id]= c.target_temperature;
+                    saved_temperatures[c.id]= c.target_temperature;
                 }
             }
         }
 
         // turn off heaters that were on
-        for(auto& h : this->saved_temperatures) {
+        for(auto& h : saved_temperatures) {
             float t= 0;
             PublicData::set_value( temperature_control_checksum, h.first, &t );
         }
@@ -637,7 +637,11 @@ void Player::suspend_part2()
         PublicData::set_value(spindel_control_data_checksum, &sp);
     } else spindle_state = false;
 
-    if(suspend_abort) spindle_state = false;
+    if(suspend_abort) {
+        // if option abort, we don't want the too to go back after resume. It will remain where moved after suspend.
+        spindle_state = false;
+        THEROBOT->get_axis_position(saved_position);
+    }
 
     THEKERNEL->streams->printf("// Print Suspended, enter resume to continue printing\n");
 }
