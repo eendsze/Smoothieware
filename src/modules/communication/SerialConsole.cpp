@@ -72,21 +72,23 @@ void SerialConsole::on_idle(void * argument)
 
 // Actual event calling must happen in the main loop because if it happens in the interrupt we will loose data
 void SerialConsole::on_main_loop(void * argument){
-    if( this->has_char('\n') ){
+    if( has_char('\n') ){
         string received;
         received.reserve(20);
         while(1){
            char c;
-           this->buffer.pop_front(c);
-           if( c == '\n' ){
+           buffer.pop_front(c);
+           if( c == '\n' ) {
                 struct SerialMessage message;
                 message.message = received;
                 message.stream = this;
                 THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
                 return;
-            }else{
-                received += c;
-            }
+           } else if( c == '\b') {
+               received.pop_back();
+           } else {
+               received += c;
+           }
         }
     }
 }
