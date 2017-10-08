@@ -65,6 +65,7 @@ class Switch : public Module {
             bool      input_pin_state:1;
             bool      switch_state:1;
             bool      ignore_on_halt:1;
+            bool      protected_action:1;
             uint8_t   failsafe:1;
         };
 };
