@@ -277,6 +277,7 @@ void USBSerial::on_idle(void *argument)
 {
     if(halt_flag) {
         halt_flag = false;
+        THEKERNEL->set_abort_msg("USB");
         THEKERNEL->call_event(ON_HALT, nullptr);
         if(THEKERNEL->is_grbl_mode()) {
             puts("ALARM: Abort during cycle\r\n");

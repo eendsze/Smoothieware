@@ -448,6 +448,7 @@ void Endstops::on_idle(void *argument)
                 this->status = LIMIT_TRIGGERED;
                 i->debounce= 0;
                 // disables heaters and motors, ignores incoming Gcode and flushes block queue
+                THEKERNEL->set_abort_msg("Enstops");
                 THEKERNEL->call_event(ON_HALT, nullptr);
                 return;
             }
@@ -653,6 +654,7 @@ void Endstops::home(axis_bitmap_t a)
         for (size_t i = X_AXIS; i <= Z_AXIS; ++i) {
             if((axis_to_home[i] || this->is_delta || this->is_rdelta) && !homing_axis[i].pin_info->triggered) {
                 this->status = NOT_HOMING;
+                THEKERNEL->set_abort_msg("Not homing");
                 THEKERNEL->call_event(ON_HALT, nullptr);
                 return;
             }
@@ -664,6 +666,7 @@ void Endstops::home(axis_bitmap_t a)
         for (size_t i = A_AXIS; i < homing_axis.size(); ++i) {
             if(axis_to_home[i] && !homing_axis[i].pin_info->triggered) {
                 this->status = NOT_HOMING;
+                THEKERNEL->set_abort_msg("Not homing");
                 THEKERNEL->call_event(ON_HALT, nullptr);
                 return;
             }

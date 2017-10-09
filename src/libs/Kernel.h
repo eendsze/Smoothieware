@@ -60,6 +60,9 @@ class Kernel {
 
         std::string get_query_string();
 
+        void set_abort_msg(const char *s) { abortMessage = s; }
+        const char* get_abort_msg(void) { return abortMessage; }
+
         // These modules are available to all other modules
         SerialConsole*    serial;
         StreamOutputPool* streams;
@@ -90,7 +93,7 @@ class Kernel {
             bool new_status_format:1;
             bool suspended:1;
         };
-
+        const char *abortMessage {""};
 };
 
 #endif

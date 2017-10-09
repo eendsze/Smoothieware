@@ -361,6 +361,7 @@ try_again:
 
                         // we cannot continue safely after an error so we enter HALT state
                         new_message.stream->printf("Entering Alarm/Halt state\n");
+                        THEKERNEL->set_abort_msg("G-code");
                         THEKERNEL->call_event(ON_HALT, nullptr);
 
                     }else{

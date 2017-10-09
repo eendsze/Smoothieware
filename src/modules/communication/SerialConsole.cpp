@@ -66,6 +66,7 @@ void SerialConsole::on_idle(void * argument)
     }
     if(halt_flag) {
         halt_flag= false;
+        THEKERNEL->set_abort_msg("console");
         THEKERNEL->call_event(ON_HALT, nullptr);
     }
 }
@@ -84,8 +85,8 @@ void SerialConsole::on_main_loop(void * argument){
                 message.stream = this;
                 THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
                 return;
-           } else if( c == '\b') {
-               received.pop_back();
+           } else if( c == 8 || c == 127) { //backspace char
+               if(received.size()) received.pop_back();
            } else {
                received += c;
            }

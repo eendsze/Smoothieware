@@ -478,7 +478,7 @@ void Player::on_get_public_data(void *argument)
 
     if(pdr->second_element_is(is_playing_checksum) || pdr->second_element_is(is_suspended_checksum)) {
         static bool bool_data;
-        bool_data = pdr->second_element_is(is_playing_checksum) ? this->playing_file : this->suspended;
+        bool_data = pdr->second_element_is(is_playing_checksum) ? (playing_file || was_playing_file) : suspended;
         pdr->set_data_ptr(&bool_data);
         pdr->set_taken();
 

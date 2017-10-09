@@ -195,14 +195,19 @@ void WatchScreen::display_menu_line(uint16_t line)
                 #endif
             }
             break;
-        case 7: THEPANEL->lcd->printf("%19s", get_status()); break;
+        case 7: if(THEKERNEL->is_halted()) {
+            THEPANEL->lcd->printf("ALARM %13s", THEKERNEL->get_abort_msg()); break;
+        } else {
+            THEPANEL->lcd->printf("%19s", get_status()); break;
+        }
     }
 }
 
 const char *WatchScreen::get_status()
 {
-    if (THEKERNEL->is_halted())
+    if (THEKERNEL->is_halted()) {
         return "ALARM";
+    }
 
     ////////////////////////
 

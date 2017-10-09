@@ -1167,6 +1167,7 @@ bool Robot::append_milestone(const float target[], float rate_mm_s)
             if( (!isnan(soft_endstop_min[i]) && transformed_target[i] < soft_endstop_min[i]) || (!isnan(soft_endstop_max[i]) && transformed_target[i] > soft_endstop_max[i]) ) {
                 if(soft_endstop_halt) {
                     THEKERNEL->streams->printf("Soft Endstop %c was exceeded - reset or M999 required\n", i+'X');
+                    THEKERNEL->set_abort_msg("Soft enstop");
                     THEKERNEL->call_event(ON_HALT, nullptr);
                     return false;
 
