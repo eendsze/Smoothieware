@@ -51,13 +51,15 @@ extern SDFAT mounter;
 
 Player::Player()
 {
-    this->playing_file = false;
-    this->current_file_handler = nullptr;
-    this->booted = false;
-    this->elapsed_secs = 0;
-    this->reply_stream = nullptr;
+    playing_file = false;
+    was_playing_file = false;
+    current_file_handler = nullptr;
+    booted = false;
+    elapsed_secs = 0;
+    reply_stream = nullptr;
     set_suspended(false);
-    this->suspend_loops= 0;
+    suspend_loops= 0;
+    spindle_state = false;
 }
 
 void Player::on_module_loaded()

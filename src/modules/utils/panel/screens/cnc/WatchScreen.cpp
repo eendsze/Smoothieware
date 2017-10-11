@@ -196,7 +196,7 @@ void WatchScreen::display_menu_line(uint16_t line)
             }
             break;
         case 7: if(THEKERNEL->is_halted()) {
-            THEPANEL->lcd->printf("ALARM %13s", THEKERNEL->get_abort_msg()); break;
+            THEPANEL->lcd->printf("**ALARM**%10s", THEKERNEL->get_abort_msg()); break;
         } else {
             THEPANEL->lcd->printf("%19s", get_status()); break;
         }
