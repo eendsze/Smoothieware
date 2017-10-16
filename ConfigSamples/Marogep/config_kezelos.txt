@@ -27,7 +27,7 @@ drillingcycles.enable                         true            # enable module, d
 drillingcycles.dwell_units                    S               # dwell units [S = seconds, P = millis], default: S
 															  
 															  
-# Kapcsolok / a pineket meg ki kell talalni
+# Suspend / resume button
 # a G-code nem valt ki output commandot, ez jo!
 switch.pause.enable                         true                     # Enable this module
 switch.pause.input_pin                      1.22!                    # Pin where pause button is connected
@@ -40,24 +40,28 @@ switch.pause.input_pin_behavior             toggle                   # This pin 
 after_suspend_gcode                         M701_G91_G0Z30_G90    #The _ character gets converted into space
 before_resume_gcode                         M702_M117         # clear suspend pin state, clear display message
 
+# Switch yojstick axes. While pushed, yojstick drives Z axis
 switch.jogax.enable                         true                     # Enable this module
 switch.jogax.input_pin                      2.12!                    
 switch.jogax.output_on_command              M777_-Z_M117_-Z-
 switch.jogax.output_off_command             M777_XY_M117
 
+# Set the material base level (Z)
 switch.bt6.enable                         true                     # Enable this module
 switch.bt6.protected                      true                     # works only if idle and not playing
 switch.bt6.input_pin                      2.13!                    
 switch.bt6.output_on_command              G10_L20_P0_Z0_M500       # Set WCS Z to 0 and save
 #switch.bt6.output_off_command            
 
+# Set the base height of the tool. This will be the reference point for material Z level
 switch.bt7.enable                         true                     # Enable this module
 switch.bt7.input_pin_behavior             longpush                 # Short push invokes "on" command; longer than 1.5 sec invokes "off" command
 switch.bt7.protected                      true                     # works only if idle and not playing
-switch.bt7.input_pin                      2.8!                    
-switch.bt7.output_on_command              M117_bt7_short
-switch.bt7.output_off_command             M117_bt7_long
+switch.bt7.input_pin                      2.8!                     # 
+switch.bt7.output_off_command             G92.4Z_G91_G0Z30_G90     # long push, set Z reference and lift the tool
+switch.bt7.output_on_command              G53_G0X10Y10             # short push, go to measurement position
 
+# Set WCS X,Y coordinates to zero
 switch.bt4.enable                         true                     # Enable this module
 switch.bt4.protected                      true                     # works only if idle and not playing
 switch.bt4.input_pin                      1.23!                    
