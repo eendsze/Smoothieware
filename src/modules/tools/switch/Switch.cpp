@@ -36,6 +36,7 @@
 #define    input_pin_behavior_checksum  CHECKSUM("input_pin_behavior")
 #define    toggle_checksum              CHECKSUM("toggle")
 #define    momentary_checksum           CHECKSUM("momentary")
+#define    longpush_checksum            CHECKSUM("longpush")
 #define    command_subcode_checksum     CHECKSUM("subcode")
 #define    input_on_command_checksum    CHECKSUM("input_on_command")
 #define    input_off_command_checksum   CHECKSUM("input_off_command")
@@ -77,6 +78,8 @@ void Switch::on_halt(void *arg)
 void Switch::on_module_loaded()
 {
     switch_changed = false;
+    longpush_state = false;
+    timer = 0;
 
     register_for_event(ON_GCODE_RECEIVED);
     register_for_event(ON_MAIN_LOOP);
@@ -104,7 +107,11 @@ void Switch::on_config_reload(void *argument)
     protected_action= THEKERNEL->config->value(switch_checksum, name_checksum, protected_action_checksum )->by_default(false)->as_bool();
 
     std::string ipb = THEKERNEL->config->value(switch_checksum, name_checksum, input_pin_behavior_checksum )->by_default("momentary")->as_string();
-    input_pin_behavior = (ipb == "momentary") ? momentary_checksum : toggle_checksum;
+    if(ipb == "toggle") {
+        input_pin_behavior = toggle_checksum;
+    } else if(ipb == "longpush") {
+        input_pin_behavior = longpush_checksum;
+    } else input_pin_behavior = momentary_checksum;
 
     if(type == "pwm"){
         output_type= SIGMADELTA;
@@ -358,6 +365,9 @@ void Switch::on_set_public_data(void *argument)
 
 void Switch::on_main_loop(void *argument)
 {
+    bool do_switch_on_action = false;
+    bool do_switch_off_action = false;
+
     if(switch_changed) {
         if(protected_action) {
             // in this mode we don't process the switch if not idle, or playin a file
@@ -375,7 +385,36 @@ void Switch::on_main_loop(void *argument)
             }
         }
 
-        if(switch_state) {
+        if( input_pin_behavior != longpush_checksum) { //normal behavior
+            if(switch_state) {
+                do_switch_on_action = true;
+            } else {
+                do_switch_off_action = true;
+            }
+        } else { //wait to decide if long push
+            if(switch_state) { // if button pushed
+                timer = 0;
+                longpush_state = true;
+            } else {
+                if(longpush_state) {
+                    // it was a short push, handle it as an "on" action
+                    do_switch_on_action = true;
+                    longpush_state = false;
+                }
+            }
+        }
+
+        switch_changed = false;
+    }
+
+    if(longpush_state && timer >= 100) {
+        //if timer elapsed, it is a long push; do "off" action
+        do_switch_off_action = true;
+        longpush_state = false;
+    }
+
+    {
+        if(do_switch_on_action) {
             if(!output_on_command.empty()) send_gcode( output_on_command, &(StreamOutput::NullStream) );
 
             if(output_type == SIGMADELTA) {
@@ -388,7 +427,8 @@ void Switch::on_main_loop(void *argument)
                 digital_pin->set(true);
             }
 
-        } else {
+        }
+        if(do_switch_off_action) {
 
             if(!output_off_command.empty()) send_gcode( output_off_command, &(StreamOutput::NullStream) );
 
@@ -402,7 +442,6 @@ void Switch::on_main_loop(void *argument)
                 digital_pin->set(false);
             }
         }
-        switch_changed = false;
     }
 }
 
@@ -412,13 +451,14 @@ uint32_t Switch::pinpoll_tick(uint32_t dummy)
 {
     if(!input_pin.connected()) return 0;
 
+    if(longpush_state) timer++;
+
     // If pin changed
     bool current_state = input_pin.get();
     if(input_pin_state != current_state) {
         input_pin_state = current_state;
         // If pin high
         if( input_pin_state ) {
-            // if switch is a toggle switch
             if( input_pin_behavior == toggle_checksum ) {
                 flip();
             } else {
@@ -429,8 +469,7 @@ uint32_t Switch::pinpoll_tick(uint32_t dummy)
 
         } else {
             // else if button released
-            if( input_pin_behavior == momentary_checksum ) {
-                // if switch is momentary
+            if( input_pin_behavior != toggle_checksum ) {
                 switch_state = input_pin_state;
                 switch_changed = true;
             }

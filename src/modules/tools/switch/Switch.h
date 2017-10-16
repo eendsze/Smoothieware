@@ -57,6 +57,7 @@ class Switch : public Module {
         uint16_t  input_pin_behavior;
         uint16_t  input_on_command_code;
         uint16_t  input_off_command_code;
+        uint16_t  timer;
         char      input_on_command_letter;
         char      input_off_command_letter;
         struct {
@@ -66,6 +67,7 @@ class Switch : public Module {
             bool      switch_state:1;
             bool      ignore_on_halt:1;
             bool      protected_action:1;
+            bool      longpush_state:1;
             uint8_t   failsafe:1;
         };
 };
