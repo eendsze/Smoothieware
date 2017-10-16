@@ -588,7 +588,8 @@ void Player::suspend_part2()
     }
 
     // save current XYZ position
-    THEROBOT->get_axis_position(saved_position);
+    //THEROBOT->get_axis_position(saved_position);
+    std::tie(saved_position[0], saved_position[1], saved_position[2]) = THEROBOT->mcs2wcs(THEROBOT->get_axis_position());
 
     // save current extruder state
     PublicData::set_value( extruder_checksum, save_state_checksum, nullptr );
@@ -642,7 +643,8 @@ void Player::suspend_part2()
     if(suspend_abort) {
         // if option abort, we don't want the too to go back after resume. It will remain where moved after suspend.
         spindle_state = false;
-        THEROBOT->get_axis_position(saved_position);
+        //THEROBOT->get_axis_position(saved_position);
+        std::tie(saved_position[0], saved_position[1], saved_position[2]) = THEROBOT->mcs2wcs(THEROBOT->get_axis_position());
     }
 
     THEKERNEL->streams->printf("// Print Suspended, enter resume to continue printing\n");
@@ -733,11 +735,11 @@ void Player::resume_command(string parameters, StreamOutput *stream )
     	// for a CNC 2.5D machine the X,Y must be restored first, and the Z at the end only.
         char buf[128];
         struct SerialMessage message;
-        snprintf(buf, sizeof(buf), "G53 G0 X%f Y%f", saved_position[0], saved_position[1]);
+        snprintf(buf, sizeof(buf), "G0 X%f Y%f", saved_position[0], saved_position[1]);
         message.message = buf;
         message.stream = &(StreamOutput::NullStream);
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
-        snprintf(buf, sizeof(buf), "G53 G0 Z%f", saved_position[2]);
+        snprintf(buf, sizeof(buf), "G0 Z%f", saved_position[2]);
         message.message = buf;
         message.stream = &(StreamOutput::NullStream);
         THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message );
