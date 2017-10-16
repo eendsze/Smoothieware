@@ -561,10 +561,19 @@ void Robot::on_gcode_received(void *argument)
 
                 } else {
                     // standard setting of the g92 offsets, making current WCS position whatever the coordinate arguments are
+                    // and subcode 4...
                     float x, y, z;
-                    std::tie(x, y, z) = g92_offset;
-                    // get current position in WCS
-                    wcs_t pos= mcs2wcs(machine_position);
+                    wcs_t pos;
+
+                    if(gcode->subcode == 4) {
+                        // if subcode 4, caclulate position based on MCS only. good for CNC tool change.
+                        pos = wcs_t(machine_position[X_AXIS], machine_position[Y_AXIS], machine_position[Z_AXIS]);
+                        x = y = z = 0.0;
+                    } else {
+                        // get current position in WCS
+                        pos= mcs2wcs(machine_position);
+                        std::tie(x, y, z) = g92_offset;
+                    }
 
                     // adjust g92 offset to make the current wpos == the value requested
                     if(gcode->has_letter('X')){
