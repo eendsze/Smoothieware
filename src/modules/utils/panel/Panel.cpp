@@ -514,18 +514,25 @@ void Panel::enter_menu_mode(bool force)
     encoder_cb_fnc= nullptr;
 }
 
-void Panel::setup_menu(uint16_t rows)
+void Panel::setup_menu(uint16_t rows, bool from_end)
 {
-    this->setup_menu(rows, min(rows, this->max_screen_lines()));
+    this->setup_menu(rows, min(rows, this->max_screen_lines()), from_end);
 }
 
-void Panel::setup_menu(uint16_t rows, uint16_t lines)
+void Panel::setup_menu(uint16_t rows, uint16_t lines, bool from_end)
 {
-    this->menu_selected_line = 0;
-    this->menu_current_line = 0;
-    this->menu_start_line = 0;
     this->menu_rows = rows;
     this->panel_lines = lines;
+
+    if(from_end) {
+        this->menu_selected_line = rows-1;
+        this->menu_current_line = rows-1;
+        this->menu_start_line = (rows - lines) > 0 ? (rows - lines) : 0;
+    } else {
+        this->menu_selected_line = 0;
+        this->menu_current_line = 0;
+        this->menu_start_line = 0;
+    }
 }
 
 void Panel::menu_update()

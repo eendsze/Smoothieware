@@ -38,7 +38,7 @@ void FileScreen::on_enter()
     }
 
     // Default folder to enter
-    this->enter_folder(THEKERNEL->current_path.c_str());
+    this->enter_folder(THEKERNEL->current_path.c_str(), true);
 }
 
 void FileScreen::on_exit()
@@ -59,7 +59,7 @@ void FileScreen::on_refresh()
 }
 
 // Enter a new folder
-void FileScreen::enter_folder(const char *folder)
+void FileScreen::enter_folder(const char *folder, bool from_end)
 {
     // Remember where we are
     THEKERNEL->current_path= folder;
@@ -68,7 +68,7 @@ void FileScreen::enter_folder(const char *folder)
     uint16_t number_of_files_in_folder = this->count_folder_content();
 
     // Setup menu
-    THEPANEL->setup_menu(number_of_files_in_folder + 1); // same number of files as menu items
+    THEPANEL->setup_menu(number_of_files_in_folder + 1, from_end); // same number of files as menu items
     THEPANEL->enter_menu_mode();
 
     // Display menu
