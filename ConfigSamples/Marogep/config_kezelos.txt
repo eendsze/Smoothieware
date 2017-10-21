@@ -58,7 +58,7 @@ switch.bt7.enable                         true                     # Enable this
 switch.bt7.input_pin_behavior             longpush                 # Short push invokes "on" command; longer than 1.5 sec invokes "off" command
 switch.bt7.protected                      true                     # works only if idle and not playing
 switch.bt7.input_pin                      2.8!                     # 
-switch.bt7.output_off_command             G92.4Z_G91_G0Z30_G90     # long push, set Z reference and lift the tool
+switch.bt7.output_off_command             G92.4Z_G91_G0Z30_G90_M500 # long push, set Z reference and lift the tool. and save
 switch.bt7.output_on_command              G53_G0X10Y10             # short push, go to measurement position
 
 # Set WCS X,Y coordinates to zero
@@ -267,6 +267,11 @@ custom_menu.res_spd.command                 M220_S100
 custom_menu.clr_ovrd.enable                 true
 custom_menu.clr_ovrd.name                   Clear_override
 custom_menu.clr_ovrd.command                M502
+
+custom_menu.reset_wcs.enable                true
+custom_menu.reset_wcs.name                  Reset_WCS
+custom_menu.reset_wcs.command               G10_L2_P0_X_Y_Z_M500
+
 
 
 ## Network settings
