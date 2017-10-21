@@ -30,6 +30,12 @@ FileScreen::FileScreen()
 void FileScreen::on_enter()
 {
     THEPANEL->lcd->clear();
+    // if extist enter the default work directory
+    DIR *d = opendir("/sd/work");
+    if( d != NULL) {
+        THEKERNEL->current_path = "/sd/work";
+        closedir(d);
+    }
 
     // Default folder to enter
     this->enter_folder(THEKERNEL->current_path.c_str());
