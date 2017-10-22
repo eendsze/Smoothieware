@@ -31,9 +31,9 @@ void FileScreen::on_enter()
 {
     THEPANEL->lcd->clear();
     // if extist enter the default work directory
-    DIR *d = opendir("/sd/work");
+    DIR *d = opendir("/sd");
     if( d != NULL) {
-        THEKERNEL->current_path = "/sd/work";
+        THEKERNEL->current_path = "/sd";
         closedir(d);
     }
 
