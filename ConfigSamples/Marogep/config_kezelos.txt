@@ -18,6 +18,8 @@ mm_max_arc_error                             0.01             # The maximum erro
 
 save_g92                                     true             # to save global offset with M500
 on_boot_gcode                                /sd/on_boot.code # not the default name to not to see it in the filelist
+on_boot_gcode_enable                         true
+
 
 # Drills module                                               
 # Implement the Canned Drilling Cycles                        
