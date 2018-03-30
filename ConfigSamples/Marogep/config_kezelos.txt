@@ -84,14 +84,18 @@ spindle.startup_time                         1000	              # ennyit var a m
 
 # Arm solution configuration : Cartesian robot. Translates mm positions into stepper positions
 # See http://smoothieware.org/stepper-motors
-alpha_steps_per_mm                           315              # Steps per mm for alpha ( X ) stepper
-beta_steps_per_mm                            315              # Steps per mm for beta ( Y ) stepper
+alpha_steps_per_mm                           209.9              # Steps per mm for alpha ( X ) stepper
+beta_steps_per_mm                            209.9              # Steps per mm for beta ( Y ) stepper
 gamma_steps_per_mm                           315              # Steps per mm for gamma ( Z ) stepper
 
 # Planner module configuration : Look-ahead and acceleration configuration
 # See http://smoothieware.org/motion-control
-acceleration                                 500             # Acceleration in mm/second/second.
-z_acceleration                               500             # Acceleration for Z only moves in mm/s^2, 0 uses acceleration which is the default. DO NOT SET ON A DELTA
+acceleration                                 300             # Acceleration in mm/second/second.
+                                             #ez es a tengelyenkenti kozul a minimum szamit, 
+											 #de le kell torolni az override/ot M502
+											 
+z_acceleration                               400             # Acceleration for Z only moves in mm/s^2, 0 uses acceleration which is the default. DO NOT SET ON A DELTA
+                                             #csak akkor szamit ha tengelyenkenti nincs megadva.
 junction_deviation                           0.01            # See http://smoothieware.org/motion-control#junction-deviation
 z_junction_deviation                         0.05            # For Z only moves. If not defined, uses junction_deviation, zero disables junction_deviation on z moves DO NOT SET ON A DELTA
 
@@ -108,19 +112,22 @@ alpha_step_pin                               2.0              # Pin for alpha st
 alpha_dir_pin                                0.5              # Pin for alpha stepper direction, add '!' to reverse direction
 alpha_en_pin                                 0.4              # Pin for alpha enable pin
 alpha_current                                0.11
-alpha_max_rate                               8500             # speed mm/min
+alpha_max_rate                               6000             # speed mm/min
+alpha_acceleration                           1000             # ezek mukodnek, de a simaval egyutt, a minimum szamit. Torold az overrideot M502!
 
 beta_step_pin                                2.1              # Pin for beta stepper step signal
-beta_dir_pin                                 0.11!             # Pin for beta stepper direction, add '!' to reverse direction
+beta_dir_pin                                 0.11             # Pin for beta stepper direction, add '!' to reverse direction
 beta_en_pin                                  0.10             # Pin for beta enable
 beta_current                                 0.11
-beta_max_rate                                8500             # speed mm/min
+beta_max_rate                                6000             # speed mm/min
+beta_acceleration                            600              # ezek mukodnek, de a simaval egyutt, a minimum szamit. Torold az overrideot M502!
 
 gamma_step_pin                               2.2              # Pin for gamma stepper step signal
-gamma_dir_pin                                0.20!             # Pin for gamma stepper direction, add '!' to reverse direction
+gamma_dir_pin                                0.20             # Pin for gamma stepper direction, add '!' to reverse direction
 gamma_en_pin                                 0.19             # Pin for gamma enable
 gamma_current                                0.08
-gamma_max_rate                               8500             # speed mm/min
+gamma_max_rate                               6000             # speed mm/min
+gamma_acceleration                           400              # ez felulirja a z_accelerationt. Torold az overrideot M502!
 
 ## Extruder module configuration
 # See http://smoothieware.org/extruder
@@ -164,26 +171,26 @@ switch.fan.output_type                       pwm              # PWM output setta
 # See http://smoothieware.org/endstops
 endstops_enable                              true             # The endstop module is enabled by default and can be disabled here
 #corexy_homing                               false            # Set to true if homing on a hbot or corexy
-alpha_min_endstop                            1.24!^            # Pin to read min endstop, add a ! to invert if endstop is NO connected to ground
+alpha_min_endstop                            1.24^            # Pin to read min endstop, add a ! to invert if endstop is NO connected to ground
 #alpha_max_endstop                           1.25^            # Pin to read max endstop, uncomment this and comment the above if using max endstops
 alpha_homing_direction                       home_to_min      # Or set to home_to_max and set alpha_max and uncomment the alpha_max_endstop
-alpha_min                                    0                # This gets loaded as the current position after homing when home_to_min is set
+alpha_min                                    25                # This gets loaded as the current position after homing when home_to_min is set
 alpha_max                                    200              # This gets loaded as the current position after homing when home_to_max is set
-beta_min_endstop                             1.26!^            # Pin to read min endstop, add a ! to invert if endstop is NO connected to ground
+beta_min_endstop                             1.26^            # Pin to read min endstop, add a ! to invert if endstop is NO connected to ground
 #beta_max_endstop                            1.27^            # Pin to read max endstop, uncomment this and comment the above if using max endstops
 beta_homing_direction                        home_to_min      # Or set to home_to_max and set alpha_max and uncomment the alpha_max_endstop
-beta_min                                     0                # This gets loaded as the current position after homing when home_to_min is set
+beta_min                                     35                # This gets loaded as the current position after homing when home_to_min is set
 beta_max                                     200              # This gets loaded as the current position after homing when home_to_max is set
 #gamma_min_endstop                           1.28^            # Pin to read min endstop, add a ! to invert if endstop is NO connected to ground
-gamma_max_endstop                            1.29!^            # Pin to read max endstop, uncomment this and comment the above if using max endstops
+gamma_max_endstop                            1.29^            # Pin to read max endstop, uncomment this and comment the above if using max endstops
 gamma_homing_direction                       home_to_max      # Or set to home_to_max and set alpha_max and uncomment the alpha_max_endstop
 gamma_min                                    0                # This gets loaded as the current position after homing when home_to_min is set
-gamma_max                                    170              # This gets loaded as the current position after homing when home_to_max is set
+gamma_max                                    90              # This gets loaded as the current position after homing when home_to_max is set
                                                 #ENNEK meg kell egyeznie a soft endstop limitjevel!
 
-alpha_max_travel                             250              # Max travel in mm for alpha/X axis when homing
-beta_max_travel                              250              # Max travel in mm for beta/Y axis when homing
-gamma_max_travel                             200              # Max travel in mm for gamma/Z axis when homing
+alpha_max_travel                             1200              # Max travel in mm for alpha/X axis when homing
+beta_max_travel                              700              # Max travel in mm for beta/Y axis when homing
+gamma_max_travel                             150              # Max travel in mm for gamma/Z axis when homing
 
 # Optional enable limit switches, actions will stop if any enabled limit switch is triggered
 #alpha_limit_enable                          false            # Set to true to enable X min and max limit switches
@@ -191,11 +198,11 @@ gamma_max_travel                             200              # Max travel in mm
 #gamma_limit_enable                          false            # Set to true to enable Z min and max limit switches
 
 # Endstops home at their fast feedrate first, then once the endstop is found they home again at their slow feedrate for accuracy
-alpha_fast_homing_rate_mm_s                  100               # Alpha/X fast homing feedrate in mm/second
+alpha_fast_homing_rate_mm_s                  50               # Alpha/X fast homing feedrate in mm/second
 alpha_slow_homing_rate_mm_s                  10               # Alpha/X slow homing feedrate in mm/second
-beta_fast_homing_rate_mm_s                   100               # Beta/Y  fast homing feedrate in mm/second
+beta_fast_homing_rate_mm_s                   50               # Beta/Y  fast homing feedrate in mm/second
 beta_slow_homing_rate_mm_s                   10               # Beta/Y  slow homing feedrate in mm/second
-gamma_fast_homing_rate_mm_s                  100                # Gamma/Z fast homing feedrate in mm/second
+gamma_fast_homing_rate_mm_s                  20                # Gamma/Z fast homing feedrate in mm/second
 gamma_slow_homing_rate_mm_s                  5                # Gamma/Z slow homing feedrate in mm/second
 
 alpha_homing_retract_mm                      5                # Distance to retract from the endstop after it is hit for alpha/X
@@ -314,7 +321,7 @@ kill_button_pin                              4.28             # Kill button pin.
 jogger.enable                                   true           #enable jogging functionality
 jogger.data_source_alpha                        horizontal     #set the first (alpha) joystick name as "horizontal"
 jogger.data_source_beta                         vertical       #set the second (beta) joystick name as "vertical"
-jogger.max_speed                                7000           #set the max jogging speed, mm/min. If not defined, "default_seek_rate" is used 
+jogger.max_speed                                5000           #set the max jogging speed, mm/min. If not defined, "default_seek_rate" is used 
 jogger.dead_zone                                0.05           #set the joystick dead-zone to 0.05. Increase if undesired jogging occurs
 jogger.nonlinearity                             2.0            #set the joystick nonlinearity (see documentation)
 jogger.refresh_rate                             20            #refresh the joystick readings ... times per second
@@ -346,6 +353,6 @@ soft_endstop.stopsd                            true            # stops SD play. 
 soft_endstop.x_min                             0.0             # minimum X
 soft_endstop.y_min                             0.0             # minimum Y
 soft_endstop.z_min                             0.0             # minimum Z NOTE leave commented out to disable checking for this axis
-soft_endstop.x_max                             180.0           # maximum X
-soft_endstop.y_max                             165.0           # maximum Y
-soft_endstop.z_max                             170.0           # maximum Z NOTE leave commented out to disable checking for this axis
+soft_endstop.x_max                             1200.0           # maximum X
+soft_endstop.y_max                             700.0           # maximum Y
+soft_endstop.z_max                             90.0           # maximum Z NOTE leave commented out to disable checking for this axis
