@@ -132,7 +132,7 @@ void Drillingcycles::peck_hole()
     // start values
     float depth  = this->sticky_r - this->sticky_z; // travel depth
     float cycles = depth / this->sticky_q;          // cycles count
-    float rest   = fmod(depth, this->sticky_q);     // final pass
+//    float rest   = fmod(depth, this->sticky_q);     // final pass
     float z_pos  = this->sticky_r;                  // current z position
 
     // for each cycle
@@ -145,8 +145,8 @@ void Drillingcycles::peck_hole()
         this->send_gcode("G0 Z%1.4f", this->sticky_r);
     }
 
-    // final depth not reached
-    if (rest > 0) {
+    // final depth
+    if (true) {
         // feed down to final depth at feedrate (F and Z)
         this->send_gcode("G1 F%1.4f Z%1.4f", this->sticky_f, this->sticky_z);
     }
