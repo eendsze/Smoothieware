@@ -95,8 +95,8 @@
 #define ISO_slash   0x2f
 #define ISO_colon   0x3a
 
-#define DEBUG_PRINTF printf
-//#define DEBUG_PRINTF(...)
+//#define DEBUG_PRINTF printf
+#define DEBUG_PRINTF(...)
 
 
 // this callback gets the results of a command, line by line. need to check if
@@ -545,7 +545,7 @@ PT_THREAD(handle_input(struct httpd_state *s))
 
                 } else if (strncmp(s->inputbuf, http_cache_control, sizeof(http_cache_control) - 1) == 0) {
                     s->inputbuf[PSOCK_DATALEN(&s->sin) - 2] = 0;
-                    s->cache_page = strncmp(http_no_cache, &s->inputbuf[sizeof(http_cache_control) - 1], sizeof(http_no_cache) - 1) != 0;
+//eendsze                    s->cache_page = strncmp(http_no_cache, &s->inputbuf[sizeof(http_cache_control) - 1], sizeof(http_no_cache) - 1) != 0;
                     DEBUG_PRINTF("cache page= %d\n", s->cache_page);
                 }
             }
